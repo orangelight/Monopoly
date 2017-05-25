@@ -6,6 +6,7 @@
 package Main.Tiles;
 
 import Main.GameInstance;
+import Main.Player;
 
 
 /**
@@ -19,7 +20,7 @@ public class Tax extends Tile {
     }
 
     @Override
-    public void action(GameInstance game) {
+    public void action(GameInstance game, Player currentPlayer) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

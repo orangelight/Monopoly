@@ -37,7 +37,7 @@ public class GameInstance {
         currentPlayer.setCurretTurn(true);
         setCurrentDiceRoll(Board.rollDice());
         currentPlayer.move(getCurrentDiceRollSum());
-        board.getTileFromID(currentPlayer.getCurrentTileID()).action(this);
+        board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
         //Wait for player to end turn
         if(isWinner()) {
             

@@ -1,6 +1,10 @@
 package Main;
 
 import Main.Tiles.Tile;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -10,7 +14,7 @@ import java.util.ArrayList;
 public class Board {
     private ArrayList<Tile> tiles;
     
-    public Board() {
+    public Board() throws IOException {
         tiles = new ArrayList<>();
         populateTiles();
         
@@ -18,8 +22,30 @@ public class Board {
     /**
      * Constructs the tiles array from a config file
      */
-    private void populateTiles() {
-        
+    private void populateTiles() throws FileNotFoundException, IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader("C:\\Users\\Alex\\Downloads\\MonopData.csv"))) {
+            for (String line; (line = br.readLine()) != null;) {
+                String[] lineData=  line.split(",");
+                //The corners that do nothing
+                if(Integer.parseInt(lineData[0])== 0 || Integer.parseInt(lineData[0])== 10 || Integer.parseInt(lineData[0])== 20) {
+                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
+
+                        @Override
+                        public void action(GameInstance game, Player currentPlayer) {
+                            
+                        }
+                    });
+                } else if(Integer.parseInt(lineData[0])== 30) { //Jail
+                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
+
+                        @Override
+                        public void action(GameInstance game, Player currentPlayer) {
+                            
+                        }
+                    });
+                }
+            }  
+        }
     }
     
     /**

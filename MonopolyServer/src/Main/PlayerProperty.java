@@ -5,19 +5,10 @@
  */
 package Main;
 
-import java.io.IOException;
-
 /**
  *
  * @author Alex
  */
-public class MonopolyServer {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) throws IOException {
-        new Board();
-    }
+public class PlayerProperty {
     
 }

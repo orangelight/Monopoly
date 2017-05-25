@@ -9,6 +9,6 @@ package Main;
  *
  * @author Alex
  */
-public class CCard {
-    
+public abstract class CCard {
+    public abstract void action(GameInstance game, Player currentPlayer);
 }

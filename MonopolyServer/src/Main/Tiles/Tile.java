@@ -6,6 +6,7 @@
 package Main.Tiles;
 
 import Main.GameInstance;
+import Main.Player;
 
 /**
  *
@@ -21,5 +22,5 @@ public abstract class Tile {
     }
     
     public int getID() {return this.id;}
-    public abstract void action(GameInstance game);
+    public abstract void action(GameInstance game, Player currentPlayer);
 }
