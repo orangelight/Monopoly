@@ -9,7 +9,6 @@ package Main;
  *
  * @author Alex
  */
-public class Trade {
-    private boolean isActive;
-    private Player owner, client;
+public class CCard {
+    
 }

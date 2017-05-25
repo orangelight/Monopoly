@@ -353,3 +353,4 @@ __pycache__/
 *.xsd.cs
 /MonopolyServer/nbproject/private/
 /MonopolyServer/build/
+/MonopolyServer/dist/

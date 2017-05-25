@@ -3,14 +3,17 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main;
+package Main.Tiles;
 
-import Main.Tiles.Property;
 
 /**
  *
  * @author Alex
  */
 public class Railroad extends Property {
+
+    public Railroad(int id, String name) {
+        super(id, name);
+    }
     
 }

@@ -10,5 +10,9 @@ package Main.Tiles;
  * @author Alex
  */
 public class Utilitie extends Property {
+
+    public Utilitie(int id, String name) {
+        super(id, name);
+    }
     
 }

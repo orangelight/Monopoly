@@ -5,12 +5,22 @@
  */
 package Main.Tiles;
 
-import Main.Tiles.Tile;
+import Main.GameInstance;
+
 
 /**
  *
  * @author Alex
  */
 public class Tax extends Tile {
+
+    public Tax(int id, String name) {
+        super(id, name);
+    }
+
+    @Override
+    public void action(GameInstance game) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

@@ -5,10 +5,21 @@
  */
 package Main.Tiles;
 
+import Main.GameInstance;
+
 /**
  *
  * @author Alex
  */
-public class Tile {
+public abstract class Tile {
+    private int id;
+    private String name;
     
+    public Tile(int id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+    
+    public int getID() {return this.id;}
+    public abstract void action(GameInstance game);
 }
