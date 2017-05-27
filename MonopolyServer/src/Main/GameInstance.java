@@ -1,6 +1,6 @@
 package Main;
 
-import Main.Player.Player;
+import Main.Player.*;
 import Main.Board.Board;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,6 +19,7 @@ public class GameInstance {
     private Board board;
     private ArrayList<Player> players;
     private ArrayList<Trade> trades;
+    private ArrayList<PlayerProperty> properties;
     private int[] currentDiceRoll;
     
     public GameInstance(ArrayList<Player> players, Board b, int startingCash) {
@@ -40,7 +41,7 @@ public class GameInstance {
         setCurrentDiceRoll(Board.rollDice());
         currentPlayer.move(getCurrentDiceRollSum(), this);
         board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
-        //Wait for player to end turn
+        currentPlayer.playTurn(this);//Wait for player to end turn
         if(isWinner()) {
             
         } else {
@@ -90,4 +91,9 @@ public class GameInstance {
     
     public int[] getCurrentDiceRoll() {return currentDiceRoll;}
     public int getCurrentDiceRollSum() {return currentDiceRoll[0]+currentDiceRoll[1];}
+    
+    public PlayerProperty getPlayerProperty(int id) {
+        return properties.get(id);
+    }
+    
 }

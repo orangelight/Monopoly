@@ -14,9 +14,9 @@ import Main.GameInstance;
  * @author Alex
  */
 public class Player {
-    private static ArrayList<Property> owned;
     private int cash, positionID;
     private boolean bankrupt, currentTurn;
+    private Debt currentDebt;
 
     
     public boolean isCurrentTurn() { return currentTurn; }
@@ -33,7 +33,7 @@ public class Player {
      * @param i number of tiles to move forward
      */
     public void move(int i, GameInstance instance) {
-        addPassGoCash(positionID+i);
+        if(positionID+i > 39) this.addCash(200); //Pass go
         this.positionID = (positionID+i)%40;
         instance.getBoard().getTileFromID(positionID).action(instance, this);
     }
@@ -43,7 +43,7 @@ public class Player {
      * @param id ID of tile to move player to
      */
     public void moveTo(int id) {
-        addPassGoCash(positionID+id);
+        if(id < positionID) this.addCash(200);
         positionID = id;
     }
     
@@ -51,7 +51,15 @@ public class Player {
         this.cash +=value;
     }
     
-    private void addPassGoCash(int value) {
-        if(value > 39) this.addCash(200); //Pass go
+    public void playTurn(GameInstance game) {
+        
     }
+    
+    public void setDebt(Debt d) {
+        this.currentDebt = d;
+    }
+    
+    public boolean isInDebt() { return this.currentDebt != null; }
+    
+    
 }

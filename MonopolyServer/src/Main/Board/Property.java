@@ -6,7 +6,9 @@
 package Main.Board;
 
 import Main.GameInstance;
+import Main.Player.Debt;
 import Main.Player.Player;
+import Main.Player.PlayerProperty;
 
 /**
  *
@@ -22,6 +24,11 @@ public class Property extends Tile {
 
     @Override
     public void action(GameInstance game, Player currentPlayer) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        PlayerProperty propData = game.getPlayerProperty(propertyID);
+        if(propData.isOwned() && !propData.isMortgaged() && !propData.getOwner().equals(currentPlayer)) {//Have to make player pay money to property owner
+            currentPlayer.setDebt(new Debt(currentPlayer, propData.getOwner(), propData.getRent()));
+        } else if(!propData.isOwned()) { //Property is not owned
+            
+        } 
     }
 }
