@@ -3,25 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main.Tiles;
+package Main.Board;
 
 import Main.GameInstance;
-import Main.Player;
-
+import Main.Player.Player;
 
 /**
  *
  * @author Alex
  */
-public class Tax extends Tile {
+public class Property extends Tile {
+    private int propertyID;
 
-    public Tax(int id, String name) {
+    public Property(int id, String name, int propertyid) {
         super(id, name);
+        this.propertyID = propertyid;
     }
 
     @Override
     public void action(GameInstance game, Player currentPlayer) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-    
 }

@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main;
+package Main.Player;
 
 import java.util.ArrayList;
-import Main.Tiles.Property;
+import Main.Board.Property;
+import Main.GameInstance;
 
 /**
  *
@@ -31,8 +32,10 @@ public class Player {
      * Moves a certain number of tiles forward 
      * @param i number of tiles to move forward
      */
-    public void move(int i) {
-        
+    public void move(int i, GameInstance instance) {
+        addPassGoCash(positionID+i);
+        this.positionID = (positionID+i)%40;
+        instance.getBoard().getTileFromID(positionID).action(instance, this);
     }
     
     /**
@@ -40,7 +43,15 @@ public class Player {
      * @param id ID of tile to move player to
      */
     public void moveTo(int id) {
-        
+        addPassGoCash(positionID+id);
+        positionID = id;
     }
     
+    public void addCash(int value) {
+        this.cash +=value;
+    }
+    
+    private void addPassGoCash(int value) {
+        if(value > 39) this.addCash(200); //Pass go
+    }
 }

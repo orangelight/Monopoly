@@ -1,5 +1,7 @@
 package Main;
 
+import Main.Player.Player;
+import Main.Board.Board;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -36,7 +38,7 @@ public class GameInstance {
         lastPlayer.setCurretTurn(false);
         currentPlayer.setCurretTurn(true);
         setCurrentDiceRoll(Board.rollDice());
-        currentPlayer.move(getCurrentDiceRollSum());
+        currentPlayer.move(getCurrentDiceRollSum(), this);
         board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
         //Wait for player to end turn
         if(isWinner()) {
@@ -80,6 +82,10 @@ public class GameInstance {
     
     private void setCurrentDiceRoll(int[] a) {
         this.currentDiceRoll = a;
+    }
+    
+    public Board getBoard() {
+        return board;
     }
     
     public int[] getCurrentDiceRoll() {return currentDiceRoll;}

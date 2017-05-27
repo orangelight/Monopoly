@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main.Tiles;
+package Main.Board;
 
 import Main.GameInstance;
-import Main.Player;
+import Main.Player.Player;
 
 /**
  *
@@ -22,5 +22,6 @@ public abstract class Tile {
     }
     
     public int getID() {return this.id;}
+    public String getName() {return this.name;}
     public abstract void action(GameInstance game, Player currentPlayer);
 }

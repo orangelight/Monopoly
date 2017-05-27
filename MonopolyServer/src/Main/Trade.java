@@ -5,6 +5,8 @@
  */
 package Main;
 
+import Main.Player.Player;
+
 /**
  *
  * @author Alex

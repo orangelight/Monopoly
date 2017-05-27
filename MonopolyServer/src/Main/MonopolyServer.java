@@ -5,6 +5,7 @@
  */
 package Main;
 
+import Main.Board.Board;
 import java.io.IOException;
 
 /**
@@ -17,7 +18,8 @@ public class MonopolyServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-        new Board();
+       
+        Board b = new Board();
     }
     
 }
