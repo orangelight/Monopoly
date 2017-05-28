@@ -13,23 +13,24 @@ import com.orangelight.monopolyserver.Main.Game.GameInstance;
  */
 public class Player {
     private String playerID;
-    private int cash, positionID;
-    private boolean bankrupt, currentTurn;
+    private int cash, positionID, jailTurn;
+    private boolean bankrupt, currentTurn, jail;
     private Debt currentDebt;
     private PropertyAuction currentPropertyAuction;
 
     public Player(String id) {
         this.playerID = id;
+        this.jailTurn = -1;
     }
     
     public boolean isCurrentTurn() { return currentTurn; }
     public void setCurretTurn(boolean b) { this.currentTurn = b; }
     public boolean isBankrupt() { return this.bankrupt; }
     public int getCurrentTileID() {return this.positionID; }
-    
-    public int getTotalAssests() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+    public boolean isJailed() { return this.jail; }
+    public int turnsInJail() { return jailTurn;}
+    public void addJailTurn() { jailTurn++;}
+    public void setJail(boolean b) { this.jail = b;}
     
     /**
      * Moves a certain number of tiles forward 
@@ -45,9 +46,23 @@ public class Player {
      * Moves player to tile with ID
      * @param id ID of tile to move player to
      */
-    public void moveTo(int id) {
-        if(id < positionID) this.addCash(200);
+    public void moveTo(int id, boolean goCash) {
+        if(goCash && id < positionID) this.addCash(200);
         positionID = id;
+    }
+    
+    public void jailPlayer(GameInstance g) {
+        this.jail = true;
+        this.jailTurn = 1;
+        moveTo(10, false);
+        g.setEligibleForRollAgain(false);
+        endTurn();
+        g.nextTurn();
+    }
+    
+    public void unJailPlayer() {
+        this.jail = false;
+        this.jailTurn = -1;
     }
     
     public void addCash(int value) {

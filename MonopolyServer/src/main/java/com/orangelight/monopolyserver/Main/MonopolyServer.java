@@ -48,13 +48,17 @@ public class MonopolyServer {
         put("/endTurn", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                if(!currentPlayer.isJailed()) {
                  if(!currentPlayer.isInDebt()) {
+                     currentPlayer.endTurn();
                      game.nextTurn();
                       return "turn ended ";
                  } else {
                       return "Still owe money";
                  }
-               
+                } else {
+                    return "You must roll or pay";
+                }
             } else {
                 return "Not your turn";
             }
@@ -79,14 +83,17 @@ public class MonopolyServer {
             }
         });
         
-         put("/paydebt", (request, response) -> {
+        put("/paydebt", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                  if(currentPlayer.getDebt() != null) {
                      Debt debt = currentPlayer.getDebt();
                      if(currentPlayer.canSubCash(debt.getAmount())) {
                          currentPlayer.addCash(-debt.getAmount());
-                         game.getPlayerFromID(debt.getReceiving()).addCash(debt.getAmount());
+                         if(debt.getReceiving()!= null) {
+                             game.getPlayerFromID(debt.getReceiving()).addCash(debt.getAmount());
+                         } 
+                         
                          currentPlayer.setDebt(null);
                          return "Whoo you payed your debt";
                      } else return "You don't have enough money";
@@ -96,6 +103,49 @@ public class MonopolyServer {
             }
         });
         
+        put("/payjail", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(currentPlayer.isJailed()) {
+                     if(currentPlayer.canSubCash(50)) {
+                        currentPlayer.addCash(-50);
+                        currentPlayer.unJailPlayer();
+                        game.outOfJailTurn(true);
+                        return "Un-jailed";
+                     } else return "You don't have enough money";
+                 } else return "You're not in jail";
+            } else {
+                return "Not your turn";
+            }
+        });
+        
+        put("/rolljail", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(currentPlayer.isJailed()) {
+                      game.setCurrentDiceRoll(Board.rollDice());
+                      if(game.isDiceDouble()) {
+                        currentPlayer.unJailPlayer();
+                        game.outOfJailTurn(false);
+                        game.setEligibleForRollAgain(false); //Don't get to go again
+                        return "Un-jailed";
+                      } else {
+                          if(currentPlayer.turnsInJail() > 2) {
+                              currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, 50));
+                              game.setEligibleForRollAgain(true);
+                              game.setNotRollJail(true);
+                              currentPlayer.unJailPlayer();
+                              return "Pay 50 to get out then roll";
+                          }  else {
+                              game.nextTurn();
+                              return "turn ended";
+                          } 
+                      }
+                 } else return "You're not in jail";
+            } else {
+                return "Not your turn";
+            }
+        });
         
     }
     

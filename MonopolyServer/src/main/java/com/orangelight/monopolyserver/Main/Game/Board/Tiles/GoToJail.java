@@ -20,7 +20,7 @@ public class GoToJail extends Tile {
 
     @Override
     public void action(GameInstance game, Player currentPlayer) {
-        
+        currentPlayer.jailPlayer(game);
     }
     
 }

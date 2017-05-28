@@ -5,6 +5,8 @@
  */
 package com.orangelight.monopolyserver.Main.Game.Player;
 
+import com.orangelight.monopolyserver.Main.Game.GameInstance;
+
 /**
  *
  * @author Alex
@@ -40,25 +42,59 @@ public class PlayerProperty {
      public boolean isMortgaged() {
          return mortgaged;
      }
+     public boolean isRailroad() {
+         return railroad;
+     }
+     
+     public boolean isUtilitie() {
+         return utilitie;
+     }
+     
+     public int getColorID() {
+         return colorID;
+     }
      
      public String getOwnerID() { return this.ownerID; }
      public int getPrice() { return this.price; }
      
-     public int getRent() {
-         if(!this.railroad && !this.utilitie) {
-             if(houses == 0&& !hotel) {
-             return this.baseRent;
-         } else if(houses == 1) {
-             return this.oneHouseRent;
-         } else if(houses == 2) {
-             return this.twoHouseRent;
-         } else if(houses == 3) {
-             return this.threeHouseRent;
-         } else if(houses == 4) {
-             return this.fourHouseRent;
-         } else {
-             return this.hotelRent;
-         }
+     public int getRent(GameInstance g) {
+         if (!this.railroad && !this.utilitie) {
+             if (houses == 0 && !hotel) {
+                 if(g.doesPlayerOwnAllColor(ownerID, this)) return this.baseRent*2;
+                 else return this.baseRent;
+             } else if (houses == 1) {
+                 return this.oneHouseRent;
+             } else if (houses == 2) {
+                 return this.twoHouseRent;
+             } else if (houses == 3) {
+                 return this.threeHouseRent;
+             } else if (houses == 4) {
+                 return this.fourHouseRent;
+             } else {
+                 return this.hotelRent;
+             }
+         } else if (this.railroad) {
+             int num = g.getPlayerRRNumberForRent(this.getOwnerID());
+             if (num == 1) {
+                 return this.oneHouseRent;
+             } else if (num == 2) {
+                 return this.twoHouseRent;
+             } else if (num == 3) {
+                 return this.threeHouseRent;
+             } else if (num == 4) {
+                 return this.fourHouseRent;
+             } else {
+                 return 0;
+             }
+         } else if (this.utilitie) {
+             int num = g.getPlayerUtilNumberForRent(this.getOwnerID());
+             if (num == 1) {
+                 return this.oneHouseRent*g.getCurrentDiceRollSum();
+             } else if (num == 2) {
+                 return this.twoHouseRent*g.getCurrentDiceRollSum();
+             } else {
+                 return 0;
+             }
          } else {
              return 0;
          }
