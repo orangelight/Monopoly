@@ -20,7 +20,7 @@ public class GoToJail extends Tile {
 
     @Override
     public void action(GameInstance game, Player currentPlayer) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        
     }
     
 }

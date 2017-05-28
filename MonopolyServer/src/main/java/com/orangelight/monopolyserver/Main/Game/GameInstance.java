@@ -117,4 +117,14 @@ public class GameInstance {
     public Player getCurrentPlayer() {
         return players.get(getCurrentPlayerIndex());
     }
+    
+    public Player getPlayerFromID(String id) {
+        for(Player p : this.players) {
+            if(p.getPlayerID().equals(id)) {
+                return p;
+            }
+        }
+        System.err.println("Could not find player in ID look up");
+        return null;
+    }
 }

@@ -45,7 +45,24 @@ public class PlayerProperty {
      public int getPrice() { return this.price; }
      
      public int getRent() {
-         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+         if(!this.railroad && !this.utilitie) {
+             if(houses == 0&& !hotel) {
+             return this.baseRent;
+         } else if(houses == 1) {
+             return this.oneHouseRent;
+         } else if(houses == 2) {
+             return this.twoHouseRent;
+         } else if(houses == 3) {
+             return this.threeHouseRent;
+         } else if(houses == 4) {
+             return this.fourHouseRent;
+         } else {
+             return this.hotelRent;
+         }
+         } else {
+             return 0;
+         }
+         
      }
      
      public void setOwner(Player p) { this.ownerID = p.getPlayerID();}

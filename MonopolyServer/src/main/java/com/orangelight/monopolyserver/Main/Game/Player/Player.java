@@ -80,4 +80,8 @@ public class Player {
         return this.currentPropertyAuction;
     }
     
+    public Debt getDebt() {
+        return this.currentDebt;
+    }
+    
 }

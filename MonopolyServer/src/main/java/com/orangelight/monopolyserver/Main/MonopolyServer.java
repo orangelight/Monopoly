@@ -62,7 +62,7 @@ public class MonopolyServer {
             
         });
         
-        put("/buyProperty", (request, response) -> {
+        put("/buyproperty", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                  if(currentPlayer.getAcution() != null) {
@@ -78,6 +78,24 @@ public class MonopolyServer {
                 return "Not your turn";
             }
         });
+        
+         put("/paydebt", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(currentPlayer.getDebt() != null) {
+                     Debt debt = currentPlayer.getDebt();
+                     if(currentPlayer.canSubCash(debt.getAmount())) {
+                         currentPlayer.addCash(-debt.getAmount());
+                         game.getPlayerFromID(debt.getReceiving()).addCash(debt.getAmount());
+                         currentPlayer.setDebt(null);
+                         return "Whoo you payed your debt";
+                     } else return "You don't have enough money";
+                 } else return "You Don't owe money";
+            } else {
+                return "Not your turn";
+            }
+        });
+        
         
     }
     
