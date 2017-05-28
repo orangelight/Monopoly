@@ -1,7 +1,8 @@
-package Main;
+package com.orangelight.monopolyserver.Main.Game;
 
-import Main.Player.*;
-import Main.Board.Board;
+import com.orangelight.monopolyserver.Main.Game.Player.PlayerProperty;
+import com.orangelight.monopolyserver.Main.Game.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.Board.Board;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -106,7 +107,7 @@ public class GameInstance {
     }
     
     private void populatePlayerProperties() throws FileNotFoundException , IOException{
-         try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("resources/PropertyData.csv").getFile()))) {
+         try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("PropertyData.csv").getFile()))) {
             for (String line; (line = br.readLine()) != null;) {
                 String[] lineData=  line.split(",");
                 properties.add(new PlayerProperty(Integer.parseInt(lineData[0]), Integer.parseInt(lineData[2]), Integer.parseInt(lineData[3]), Integer.parseInt(lineData[4]), Integer.parseInt(lineData[5]), Integer.parseInt(lineData[6]), Integer.parseInt(lineData[7]), Integer.parseInt(lineData[8]), Integer.parseInt(lineData[0]), Integer.parseInt(lineData[10]), Boolean.parseBoolean(lineData[12]), Boolean.parseBoolean(lineData[11])));

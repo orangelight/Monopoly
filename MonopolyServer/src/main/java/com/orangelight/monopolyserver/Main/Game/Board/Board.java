@@ -1,7 +1,7 @@
-package Main.Board;
+package com.orangelight.monopolyserver.Main.Game.Board;
 
-import Main.GameInstance;
-import Main.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.GameInstance;
+import com.orangelight.monopolyserver.Main.Game.Player.Player;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,7 +24,7 @@ public class Board {
      * Constructs the tiles array from a config file
      */
     private void populateTiles() throws FileNotFoundException, IOException {
-        try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("resources/BoardData.csv").getFile()))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("BoardData.csv").getFile()))) {
             for (String line; (line = br.readLine()) != null;) {
                 String[] lineData=  line.split(",");
                 //The corners that do nothing

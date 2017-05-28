@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main.Board;
+package com.orangelight.monopolyserver.Main.Game.Board;
 
-import Main.GameInstance;
-import Main.Player.Debt;
-import Main.Player.Player;
-import Main.Player.PlayerProperty;
+import com.orangelight.monopolyserver.Main.Game.GameInstance;
+import com.orangelight.monopolyserver.Main.Game.Player.Debt;
+import com.orangelight.monopolyserver.Main.Game.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.Player.PlayerProperty;
 
 /**
  *

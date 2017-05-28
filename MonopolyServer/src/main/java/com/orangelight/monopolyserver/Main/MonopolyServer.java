@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main;
+package com.orangelight.monopolyserver.Main;
 
-import Main.Board.Board;
-import Main.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.GameInstance;
+import com.orangelight.monopolyserver.Main.Game.Board.Board;
+import com.orangelight.monopolyserver.Main.Game.Player.Player;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -22,7 +23,7 @@ public class MonopolyServer {
     public static void main(String[] args) throws IOException {
        ArrayList<Player> p = new ArrayList<>();
        p.add(new Player());
-        new GameInstance(p, new Board());
+       new GameInstance(p, new Board());
     }
     
 }

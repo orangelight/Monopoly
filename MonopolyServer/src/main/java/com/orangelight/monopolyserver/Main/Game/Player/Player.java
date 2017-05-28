@@ -3,9 +3,9 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Main.Player;
+package com.orangelight.monopolyserver.Main.Game.Player;
 
-import Main.GameInstance;
+import com.orangelight.monopolyserver.Main.Game.GameInstance;
 
 /**
  *

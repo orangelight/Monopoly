@@ -354,3 +354,4 @@ __pycache__/
 /MonopolyServer/nbproject/private/
 /MonopolyServer/build/
 /MonopolyServer/dist/
+/MonopolyServer/target/
