@@ -54,8 +54,12 @@ public class Player {
         this.cash +=value;
     }
     
-    public void playTurn(GameInstance game) {
-        
+    public boolean canSubCash(int value) {
+        return (getCash()-value) >= 0;
+    }
+    
+    public void endTurn() {
+        setAcution(null);
     }
     
     public void setDebt(Debt d) {
@@ -69,5 +73,11 @@ public class Player {
     public boolean isInDebt() { return this.currentDebt != null; }
     
     public String getPlayerID() { return this.playerID; }
+    
+    public int getCash() { return this.cash; }
+    
+    public PropertyAuction getAcution() {
+        return this.currentPropertyAuction;
+    }
     
 }

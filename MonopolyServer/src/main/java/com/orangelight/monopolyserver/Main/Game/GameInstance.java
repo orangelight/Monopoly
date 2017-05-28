@@ -15,10 +15,10 @@ import java.util.Collections;
  * @author Alex
  */
 public class GameInstance {
-    private final Board board;
     private ArrayList<Player> players;
-    private ArrayList<PlayerProperty> properties;
     private int[] currentDiceRoll;
+    private ArrayList<PlayerProperty> properties;
+    private final Board board;
     
     public GameInstance(Board b) throws IOException {
         properties = new ArrayList<>();
@@ -31,6 +31,7 @@ public class GameInstance {
         this.players.get(this.players.size() -1).setCurretTurn(true); //Set it to last player so when we call nextTurn it circles around to the first player
         this.currentDiceRoll = new int[] {-1, -1}; 
         for(Player p : players) p.addCash(1500);
+        this.nextTurn();
     }
 
     public void loadGame(int gameID) {
@@ -43,15 +44,15 @@ public class GameInstance {
     }
     
     public void nextTurn() {
-        System.out.println("***starting turn");
         Player lastPlayer = players.get(getCurrentPlayerIndex());
+        lastPlayer.endTurn();        
         Player currentPlayer = players.get(getNextPlayerIndex());
         lastPlayer.setCurretTurn(false);
         currentPlayer.setCurretTurn(true);
         setCurrentDiceRoll(Board.rollDice());
         currentPlayer.move(getCurrentDiceRollSum(), this);
         board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
-        currentPlayer.playTurn(this);//Wait for player to end turn
+       //Wait for player to end turn
         if(isWinner()) {
             
         }
@@ -113,4 +114,7 @@ public class GameInstance {
          }
     }
     
+    public Player getCurrentPlayer() {
+        return players.get(getCurrentPlayerIndex());
+    }
 }

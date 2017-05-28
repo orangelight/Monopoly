@@ -10,7 +10,7 @@ package com.orangelight.monopolyserver.Main.Game.Player;
  * @author Alex
  */
 public class PlayerProperty {
-     private int houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost, id;
+     private int id, houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost;
      private boolean mortgaged, utilitie, railroad, hotel;
      private String ownerID;
      
@@ -42,6 +42,7 @@ public class PlayerProperty {
      }
      
      public String getOwnerID() { return this.ownerID; }
+     public int getPrice() { return this.price; }
      
      public int getRent() {
          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.

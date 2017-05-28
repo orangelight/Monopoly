@@ -9,9 +9,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.orangelight.monopolyserver.Main.Game.GameInstance;
 import com.orangelight.monopolyserver.Main.Game.Board.Board;
-import com.orangelight.monopolyserver.Main.Game.Board.Tiles.Tile;
-import com.orangelight.monopolyserver.Main.Game.Player.Debt;
-import com.orangelight.monopolyserver.Main.Game.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.Board.Tiles.*;
+import com.orangelight.monopolyserver.Main.Game.Player.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import spark.Request;
@@ -31,6 +30,9 @@ public class MonopolyServer {
     public static void main(String[] args) throws IOException {
        ArrayList<Player> p = new ArrayList<>();
        p.add(new Player("alex"));
+       p.add(new Player("joe"));
+       p.add(new Player("bob"));
+       p.add(new Player("luke"));
        GameInstance game = new GameInstance(new Board());
        game.newGame(p ,1500);
         get("/board", (request, response) -> {
@@ -44,9 +46,39 @@ public class MonopolyServer {
         });
        
         put("/endTurn", (request, response) -> {
-            game.nextTurn();
-            return "turn ended ";
+            Player currentPlayer = game.getCurrentPlayer();
+            if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(!currentPlayer.isInDebt()) {
+                     game.nextTurn();
+                      return "turn ended ";
+                 } else {
+                      return "Still owe money";
+                 }
+               
+            } else {
+                return "Not your turn";
+            }
+           
+            
         });
+        
+        put("/buyProperty", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(currentPlayer.getAcution() != null) {
+                     PlayerProperty prop =  game.getPlayerProperty(currentPlayer.getAcution().getPropertyID());
+                     if(currentPlayer.canSubCash(prop.getPrice())) {
+                         currentPlayer.addCash(-prop.getPrice());
+                         prop.setOwner(currentPlayer);
+                         currentPlayer.setAcution(null);
+                         return "Bought";
+                     } else return "You don't have enough money";
+                 } else return "You can't buy this";
+            } else {
+                return "Not your turn";
+            }
+        });
+        
     }
     
 }

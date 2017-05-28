@@ -15,5 +15,5 @@ public class PropertyAuction {
         this.propertyID = id;
     }
     
-    
+    public int getPropertyID() { return this.propertyID; }
 }
