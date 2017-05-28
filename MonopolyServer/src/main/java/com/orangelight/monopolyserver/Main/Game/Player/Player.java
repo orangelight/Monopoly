@@ -12,10 +12,15 @@ import com.orangelight.monopolyserver.Main.Game.GameInstance;
  * @author Alex
  */
 public class Player {
+    private String playerID;
     private int cash, positionID;
     private boolean bankrupt, currentTurn;
     private Debt currentDebt;
+    private PropertyAuction currentPropertyAuction;
 
+    public Player(String id) {
+        this.playerID = id;
+    }
     
     public boolean isCurrentTurn() { return currentTurn; }
     public void setCurretTurn(boolean b) { this.currentTurn = b; }
@@ -57,7 +62,12 @@ public class Player {
         this.currentDebt = d;
     }
     
+    public void setAcution(PropertyAuction p) {
+        this.currentPropertyAuction = p;
+    }
+    
     public boolean isInDebt() { return this.currentDebt != null; }
     
+    public String getPlayerID() { return this.playerID; }
     
 }

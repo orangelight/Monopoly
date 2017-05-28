@@ -10,40 +10,40 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
  *
  * @author Alex
  */
 public class GameInstance {
-    private Board board;
+    private final Board board;
     private ArrayList<Player> players;
     private ArrayList<PlayerProperty> properties;
     private int[] currentDiceRoll;
     
-    public GameInstance(ArrayList<Player> players, Board b) throws IOException {
+    public GameInstance(Board b) throws IOException {
         properties = new ArrayList<>();
         populatePlayerProperties();
+        this.board = b;
     }
     
-    public void newGame(int startingCash) {
+    public void newGame(ArrayList<Player> players, int startingCash) {
         this.players = choosePlayerRotation(players);
         this.players.get(this.players.size() -1).setCurretTurn(true); //Set it to last player so when we call nextTurn it circles around to the first player
         this.currentDiceRoll = new int[] {-1, -1}; 
         for(Player p : players) p.addCash(1500);
     }
 
+    public void loadGame(int gameID) {
+        
+    }
+    
     private static ArrayList<Player> choosePlayerRotation(ArrayList<Player>  p) {
         Collections.shuffle(p);
         return p;
     }
     
     public void nextTurn() {
+        System.out.println("***starting turn");
         Player lastPlayer = players.get(getCurrentPlayerIndex());
         Player currentPlayer = players.get(getNextPlayerIndex());
         lastPlayer.setCurretTurn(false);
@@ -54,8 +54,6 @@ public class GameInstance {
         currentPlayer.playTurn(this);//Wait for player to end turn
         if(isWinner()) {
             
-        } else {
-            nextTurn();
         }
         
     }
@@ -114,6 +112,5 @@ public class GameInstance {
             }
          }
     }
-    
     
 }

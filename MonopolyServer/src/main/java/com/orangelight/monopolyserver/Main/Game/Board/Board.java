@@ -1,22 +1,21 @@
 package com.orangelight.monopolyserver.Main.Game.Board;
 
-import com.orangelight.monopolyserver.Main.Game.GameInstance;
-import com.orangelight.monopolyserver.Main.Game.Player.Player;
+
+import com.orangelight.monopolyserver.Main.Game.Board.Tiles.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  *
  * @author Alex
  */
 public class Board {
-    private ArrayList<Tile> tiles;
+    private Tile[] tiles;
     
     public Board() throws IOException {
-        tiles = new ArrayList<>();
+        tiles = new Tile[40];
         populateTiles();
         
     }
@@ -25,51 +24,22 @@ public class Board {
      */
     private void populateTiles() throws FileNotFoundException, IOException {
         try (BufferedReader br = new BufferedReader(new FileReader(getClass().getClassLoader().getResource("BoardData.csv").getFile()))) {
+            int index = 0;
             for (String line; (line = br.readLine()) != null;) {
                 String[] lineData=  line.split(",");
                 //The corners that do nothing
                 if(Integer.parseInt(lineData[0])== 0 || Integer.parseInt(lineData[0])== 10 || Integer.parseInt(lineData[0])== 20) {
-                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
-
-                        @Override
-                        public void action(GameInstance game, Player currentPlayer) {
-                            
-                        }
-                    });
-                } else if(Integer.parseInt(lineData[0])== 30) { //Jail
-                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
-
-                        @Override
-                        public void action(GameInstance game, Player currentPlayer) {
-                            
-                        }
-                    });
+                    tiles[index++] = (new CornerTile(Integer.parseInt(lineData[0]), lineData[1], -1, false, false, false));
+                } else if(Integer.parseInt(lineData[0])== 30) { //Go to jail
+                    tiles[index++] = (new GoToJail(Integer.parseInt(lineData[0]), lineData[1], -1, false, false, false));
                 } else if(Boolean.parseBoolean(lineData[3])) { //Community
-                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
-
-                        @Override
-                        public void action(GameInstance game, Player currentPlayer) {
-                            
-                        }
-                    });
+                    tiles[index++] = (new CardTile(Integer.parseInt(lineData[0]), lineData[1], -1, false, false, true));
                 } else if(Boolean.parseBoolean(lineData[4])) { //Chance
-                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
-
-                        @Override
-                        public void action(GameInstance game, Player currentPlayer) {
-                            
-                        }
-                    });
+                    tiles[index++] = (new CardTile(Integer.parseInt(lineData[0]), lineData[1], -1, false, true, false));
                 } else if(Boolean.parseBoolean(lineData[5])) { //Tax
-                    tiles.add(new Tile(Integer.parseInt(lineData[0]), lineData[1]) {
-
-                        @Override
-                        public void action(GameInstance game, Player currentPlayer) {
-                            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-                        }
-                    });   
+                    tiles[index++] = (new TaxTile(Integer.parseInt(lineData[0]), lineData[1], -1, true, false, false));   
                 } else if(Integer.parseInt(lineData[2]) != -1) {
-                    tiles.add(new Property(Integer.parseInt(lineData[0]), lineData[1],Integer.parseInt(lineData[2])));
+                    tiles[index++] = (new PropertyTile(Integer.parseInt(lineData[0]), lineData[1],Integer.parseInt(lineData[2]), false, false, false));
                 } else {
                     System.err.println("Error reading board csv");
                 }
@@ -90,7 +60,8 @@ public class Board {
     }
     
     public Tile getTileFromID(int id) {
-        return tiles.get(id);
+        return tiles[id];
     }
     
+    public Tile[] getTiles() {return tiles;}
 }

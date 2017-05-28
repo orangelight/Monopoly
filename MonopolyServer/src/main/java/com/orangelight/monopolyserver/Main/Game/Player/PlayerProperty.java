@@ -12,7 +12,7 @@ package com.orangelight.monopolyserver.Main.Game.Player;
 public class PlayerProperty {
      private int houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost, id;
      private boolean mortgaged, utilitie, railroad, hotel;
-     private Player owner;
+     private String ownerID;
      
      public PlayerProperty(int id, int color, int price, int rent, int rent1H, int rent2H, int rent3H, int rent4H, int rentHotel, int houseCost, boolean railRoad, boolean utilitie) {
          this.id = id;
@@ -34,16 +34,18 @@ public class PlayerProperty {
       * @return 
       */
      public boolean isOwned() {
-         return owner != null;
+         return ownerID != null;
      }
      
      public boolean isMortgaged() {
          return mortgaged;
      }
      
-     public Player getOwner() { return this.owner; }
+     public String getOwnerID() { return this.ownerID; }
      
      public int getRent() {
          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
      }
+     
+     public void setOwner(Player p) { this.ownerID = p.getPlayerID();}
 }

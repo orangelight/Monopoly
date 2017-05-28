@@ -10,17 +10,17 @@ package com.orangelight.monopolyserver.Main.Game.Player;
  * @author Alex
  */
 public class Debt {
-    private Player paying, receiving;
+    private String payingID, receivingID;
     private int amount;
     
-    public Debt(Player pay, Player rec, int value) {
-        this.paying = pay;
-        this.receiving = rec;
+    public Debt(String pay, String rec, int value) {
+        this.payingID = pay;
+        this.receivingID = rec;
         this.amount = value;
     }
     
     public int getAmount() { return this.amount; }
-    public Player getPaying() { return this.paying; }
-    public Player getReceiving() { return this.receiving; }
+    public String getPaying() { return this.payingID; }
+    public String getReceiving() { return this.receivingID; }
     
 }
