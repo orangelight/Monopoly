@@ -20,7 +20,13 @@ public class CardTile extends Tile {
 
     @Override
     public void action(GameInstance game, Player currentPlayer) {
-        
+        if(isChance()) {
+            game.pullChanceCard().action(game, currentPlayer);
+        } else if(isCommunity()) {
+            game.pullCommunityCard().action(game, currentPlayer);
+        } else {
+            System.out.println("Something messed up... this should be a chance or community tile....");
+        }
     }
     
 }

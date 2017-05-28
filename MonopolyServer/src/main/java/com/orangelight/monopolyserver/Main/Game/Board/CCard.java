@@ -13,5 +13,12 @@ import com.orangelight.monopolyserver.Main.Game.Player.Player;
  * @author Alex
  */
 public abstract class CCard {
+    private int id;
+    private String description, ownerID;
+    
+    public int getID() { return this.id;}
+    public boolean isTaken() { return ownerID!=null; }
+    public void setOwner(String id) { this.ownerID = id; }
+    
     public abstract void action(GameInstance game, Player currentPlayer);
 }

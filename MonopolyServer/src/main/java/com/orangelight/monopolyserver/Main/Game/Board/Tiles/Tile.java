@@ -29,5 +29,7 @@ public abstract class Tile {
     public int getID() {return this.id;}
     public String getName() {return this.name;}
     public int getPropertyID() {return this.propertyID;}
+    public boolean isChance() { return this.chance;}
+    public boolean isCommunity() { return this.communityChest;}
     public abstract void action(GameInstance game, Player currentPlayer);
 }

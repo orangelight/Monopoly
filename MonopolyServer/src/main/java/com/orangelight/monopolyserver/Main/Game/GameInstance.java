@@ -1,8 +1,7 @@
 package com.orangelight.monopolyserver.Main.Game;
 
-import com.orangelight.monopolyserver.Main.Game.Player.PlayerProperty;
-import com.orangelight.monopolyserver.Main.Game.Player.Player;
-import com.orangelight.monopolyserver.Main.Game.Board.Board;
+import com.orangelight.monopolyserver.Main.Game.Player.*;
+import com.orangelight.monopolyserver.Main.Game.Board.*;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,12 +18,17 @@ public class GameInstance {
     private int[] currentDiceRoll;
     private ArrayList<PlayerProperty> properties;
     private final Board board;
-    private int doubleDiceNum = 0;
+    private int doubleDiceNum = 0, chanceIndex =0, communityIndex = 0;
     private boolean eligibleForRollAgain, noRollJail = false;
+    private ArrayList<CCard> chance, community;
     
     public GameInstance(Board b) throws IOException {
         properties = new ArrayList<>();
+        chance = new ArrayList<>();
+        community = new ArrayList<>();
         populatePlayerProperties();
+        populateChanceCards();
+        populateCommunityCards();
         this.board = b;
     }
     
@@ -203,6 +207,14 @@ public class GameInstance {
          }
     }
     
+    private void populateChanceCards() {
+        
+    }
+    
+    private void populateCommunityCards() {
+        
+    }
+    
     public Player getCurrentPlayer() {
         return players.get(getCurrentPlayerIndex());
     }
@@ -253,5 +265,30 @@ public class GameInstance {
      
      public boolean isDiceDouble() {
         return (currentDiceRoll[0]==currentDiceRoll[1]);
+     }
+     
+     public CCard pullChanceCard() {
+         if(chanceIndex > chance.size()-1) {
+             chanceIndex = 0;
+         }
+         if(!chance.get(chanceIndex).isTaken()){
+             return chance.get(chanceIndex++);
+         } else {
+             chanceIndex++;
+             return pullChanceCard();
+         }
+         
+     }
+     
+     public CCard pullCommunityCard() {
+         if(communityIndex > community.size()-1) {
+             communityIndex = 0;
+         }
+         if(!community.get(communityIndex).isTaken()){
+             return community.get(communityIndex++);
+         } else {
+             communityIndex++;
+             return pullChanceCard();
+         }
      }
 }
