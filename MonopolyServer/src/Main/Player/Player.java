@@ -5,8 +5,6 @@
  */
 package Main.Player;
 
-import java.util.ArrayList;
-import Main.Board.Property;
 import Main.GameInstance;
 
 /**

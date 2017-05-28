@@ -10,9 +10,24 @@ package Main.Player;
  * @author Alex
  */
 public class PlayerProperty {
-     private int houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost;
-     private boolean mortgaged;
+     private int houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost, id;
+     private boolean mortgaged, utilitie, railroad, hotel;
      private Player owner;
+     
+     public PlayerProperty(int id, int color, int price, int rent, int rent1H, int rent2H, int rent3H, int rent4H, int rentHotel, int houseCost, boolean railRoad, boolean utilitie) {
+         this.id = id;
+         this.colorID = color;
+         this.price = price;
+         this.baseRent = rent;
+         this.oneHouseRent = rent1H;
+         this.twoHouseRent = rent2H;
+         this.threeHouseRent = rent3H;
+         this.fourHouseRent = rent4H;
+         this.hotelRent = rentHotel;
+         this.houseCost = houseCost;
+         this.railroad = railRoad;
+         this.utilitie = utilitie; 
+     }
      
      /**
       * If the property is owned then the owner will not be null

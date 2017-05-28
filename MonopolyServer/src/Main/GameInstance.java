@@ -2,6 +2,10 @@ package Main;
 
 import Main.Player.*;
 import Main.Board.Board;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -18,16 +22,21 @@ import java.util.Collections;
 public class GameInstance {
     private Board board;
     private ArrayList<Player> players;
-    private ArrayList<Trade> trades;
     private ArrayList<PlayerProperty> properties;
     private int[] currentDiceRoll;
     
-    public GameInstance(ArrayList<Player> players, Board b, int startingCash) {
-        this.players = choosePlayerRotation(players);
-        this.players.get(this.players.size() -1).setCurretTurn(true); //Set it to last player so when we call nextTurn it circles around to the first player
-        this.currentDiceRoll = new int[] {-1, -1};
+    public GameInstance(ArrayList<Player> players, Board b) throws IOException {
+        properties = new ArrayList<>();
+        populatePlayerProperties();
     }
     
+    public void newGame(int startingCash) {
+        this.players = choosePlayerRotation(players);
+        this.players.get(this.players.size() -1).setCurretTurn(true); //Set it to last player so when we call nextTurn it circles around to the first player
+        this.currentDiceRoll = new int[] {-1, -1}; 
+        for(Player p : players) p.addCash(1500);
+    }
+
     private static ArrayList<Player> choosePlayerRotation(ArrayList<Player>  p) {
         Collections.shuffle(p);
         return p;
@@ -95,5 +104,15 @@ public class GameInstance {
     public PlayerProperty getPlayerProperty(int id) {
         return properties.get(id);
     }
+    
+    private void populatePlayerProperties() throws FileNotFoundException , IOException{
+         try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("resources/PropertyData.csv").getFile()))) {
+            for (String line; (line = br.readLine()) != null;) {
+                String[] lineData=  line.split(",");
+                properties.add(new PlayerProperty(Integer.parseInt(lineData[0]), Integer.parseInt(lineData[2]), Integer.parseInt(lineData[3]), Integer.parseInt(lineData[4]), Integer.parseInt(lineData[5]), Integer.parseInt(lineData[6]), Integer.parseInt(lineData[7]), Integer.parseInt(lineData[8]), Integer.parseInt(lineData[0]), Integer.parseInt(lineData[10]), Boolean.parseBoolean(lineData[12]), Boolean.parseBoolean(lineData[11])));
+            }
+         }
+    }
+    
     
 }

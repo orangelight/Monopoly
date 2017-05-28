@@ -6,7 +6,9 @@
 package Main;
 
 import Main.Board.Board;
+import Main.Player.Player;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  *
@@ -18,8 +20,9 @@ public class MonopolyServer {
      * @param args the command line arguments
      */
     public static void main(String[] args) throws IOException {
-       
-        Board b = new Board();
+       ArrayList<Player> p = new ArrayList<>();
+       p.add(new Player());
+        new GameInstance(p, new Board());
     }
     
 }
