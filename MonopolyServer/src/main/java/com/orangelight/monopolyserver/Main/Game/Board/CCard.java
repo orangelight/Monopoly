@@ -27,6 +27,8 @@ public abstract class CCard {
     public boolean isTaken() { return ownerID!=null; }
     public void setOwner(String id) { this.ownerID = id; }
     public int[] getData() { return this.data; }
+    public String getOwnerID() { return this.ownerID; }
+    public int getType() { return this.getType(); }
     
     public abstract void action(GameInstance game, Player currentPlayer);
 }

@@ -25,7 +25,14 @@ public class PropertyTile extends Tile {
     public void action(GameInstance game, Player currentPlayer) {
         PlayerProperty propData = game.getPlayerProperty(getPropertyID());
         if(propData.isOwned() && !propData.isMortgaged() && !propData.getOwnerID().equals(currentPlayer.getPlayerID())) {//Have to make player pay money to property owner
-            currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), propData.getOwnerID(), propData.getRent(game)));
+            int rent = propData.getRent(game);
+            if(currentPlayer.canSubCash(rent)) {
+                currentPlayer.addCash(-rent);
+                game.getPlayerFromID(propData.getOwnerID()).addCash(rent);
+            } else {
+                currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), propData.getOwnerID(), rent));
+            }
+            
         } else if(!propData.isOwned()) { //Property is not owned
             currentPlayer.setAcution(new PropertyAuction(getPropertyID()));
         } 

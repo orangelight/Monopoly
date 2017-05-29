@@ -313,6 +313,14 @@ public class GameInstance {
         this.noRollJail = b;
     }
     
+    public ArrayList<CCard> getChanceCards() {
+        return this.chance;
+    }
+    
+    public ArrayList<CCard> getCommunityCards() {
+        return this.community;
+    }
+    
     public Player getPlayerFromID(String id) {
         for(Player p : this.players) {
             if(p.getPlayerID().equals(id)) {
@@ -443,4 +451,34 @@ public class GameInstance {
          }
          return minID;
      }
+     
+     public boolean canPutHouse(PlayerProperty propColor) {
+         if(propColor.getHouses() == 4 || numberOfHouses() > 31) return false;//Can't have more than 4 houses
+         for(PlayerProperty p: properties) {
+             if(p.getColorID() == propColor.getColorID() && propColor.getID() != p.getID()) {
+                 if(Math.abs((propColor.getHouses()+1)-p.getHouses()) > 1) {
+                     return false;
+                 }
+             }
+         }
+         return true;
+     }
+     
+      public boolean canPutHotel(PlayerProperty propColor) {
+         if(propColor.getHouses() < 4 || propColor.hasHotel()) return false;
+         for(PlayerProperty p: properties) {
+             if(p.getColorID() == propColor.getColorID() && propColor.getID() != p.getID()) {
+                 if(!p.hasHotel() && p.getHouses() < 4) return false;
+             }
+         }
+         return true;
+     }
+      
+      public int numberOfHouses() {
+          int houseSum = 0;
+          for(PlayerProperty p : properties) {
+              if(p.getOwnerID()!=null) houseSum+=p.getHouses();
+          }
+          return houseSum;
+      }
 }

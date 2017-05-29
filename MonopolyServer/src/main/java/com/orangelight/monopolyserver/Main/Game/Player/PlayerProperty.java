@@ -65,6 +65,12 @@ public class PlayerProperty {
      public String getOwnerID() { return this.ownerID; }
      public int getPrice() { return this.price; }
      
+     public int getHouseCost() { return this.houseCost; }
+     public int getHotelCost() { return this.houseCost; }
+     public void setHouses(int i) { this.houses = i; }
+     public void addHouse() { this.houses++; }
+     public void setHotel(boolean b) { this.hotel = b; }
+     
      public int getRent(GameInstance g) {
          if (!this.railroad && !this.utilitie) {
              if (houses == 0 && !hotel) {
