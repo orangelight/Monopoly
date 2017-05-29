@@ -39,6 +39,8 @@ public class GameInstance {
         this.currentDiceRoll = new int[] {-1, -1}; 
         for(Player p : players) p.addCash(1500);
         eligibleForRollAgain = false;
+        Collections.shuffle(chance);
+        Collections.shuffle(community);
         this.nextTurn();
     }
 
@@ -120,36 +122,6 @@ public class GameInstance {
         } else {
             currentPlayer.addJailTurn();
         }
-        
-        
-        
-//        //Jail
-//        if(currentPlayer.isJailed()) {
-//            
-//            if(isDiceDouble() && doubleDiceNum != 3) {
-//                currentPlayer.unJailPlayer();
-//                currentPlayer.move(getCurrentDiceRollSum(), this);
-//                board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
-//                eligibleForRollAgain = false;
-//            } else {
-//                if(currentPlayer.turnsInJail() > 2) {//Get out of jail after 3 turns
-//                    if(currentPlayer.canSubCash(50)) {
-//                        currentPlayer.addCash(-50);
-//                        currentPlayer.unJailPlayer();;
-//                        currentPlayer.move(getCurrentDiceRollSum(), this);
-//                        board.getTileFromID(currentPlayer.getCurrentTileID()).action(this, currentPlayer);
-//                    } else {
-//                        throw new UnsupportedOperationException();
-//                        //Ummm you don't have enough money to get out of jail
-//                    }
-//                }else {
-//                   doubleDiceNum = 0;
-//                   eligibleForRollAgain = false;
-//                }
-//            }
-//        } else {//Regular turn
-//            
-//        }   
     }
     
     private int getNextPlayerIndex() {
@@ -216,8 +188,13 @@ public class GameInstance {
          }
     }
     
-    private void populateCommunityCards() {
-        
+    private void populateCommunityCards()throws FileNotFoundException, IOException {
+         try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("CommunityData.csv").getFile()))) {
+            for (String line; (line = br.readLine()) != null;) {
+                String[] lineData=  line.split(",");
+                community.add(getCardFromLine(lineData));
+            }
+         }
     }
     
     private CCard getCardFromLine(String[] s) {
@@ -286,7 +263,10 @@ public class GameInstance {
                             else numHouses+=p.getHouses();
                         }
                     }
-                    currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, (getData()[0]*numHouses)+(getData()[1]*numHotels)));
+                    if(numHotels!=0&numHouses!=0) {
+                        currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, (getData()[0]*numHouses)+(getData()[1]*numHotels)));
+                    }
+                    
                 }
             };
         } else if (type == 7) {//Pay each player
@@ -322,7 +302,8 @@ public class GameInstance {
                 }
             };
         }
-    }
+        return null;
+    } 
     
     public Player getCurrentPlayer() {
         return players.get(getCurrentPlayerIndex());

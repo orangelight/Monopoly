@@ -1,0 +1,16 @@
+0,0,Bank pays you dividend of $50,50,
+1,0,Your building and load matures collect $150,150,
+2,1,Pay poor tax of $15,15,
+3,2,Take a ride on the reading if you pass go collect $200,5,1
+4,2,Advance to Go,0,1
+5,2,Take a walk on the board walk advance token to board walk,39,0
+6,2,Advance to St. Charles Place if you pass go collect $200,11,1
+7,2,Advance to Illionois Ave.,24,0
+8,3,Go back 3 spaces,3,
+9,4,Advance token to nearest utility if unowned you may buy it from bank. If owned throw dice and pay owner a total ten times the amount thrown.,10,
+10,5,Advance token to nearest Railroad and pay owner a twice the rental to which he is otherwise entitled. If Railroad is unowned you may buy it from bank,2,
+11,5,Advance token to nearest Railroad and pay owner a twice the rental to which he is otherwise entitled. If Railroad is unowned you may buy it from bank,2,
+12,6,Make General Repairs On All Your Property For Each House Pay 25 For Each Hotel $100,25,100
+13,7,You have been elected chairman of the board pay each player $50,50,
+14,8,Go Directly to jail. Do not pass Go do not collect $200,,
+15,9,Get out of jail free,,
