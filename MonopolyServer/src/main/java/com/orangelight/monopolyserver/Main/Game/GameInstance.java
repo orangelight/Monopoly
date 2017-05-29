@@ -2,6 +2,7 @@ package com.orangelight.monopolyserver.Main.Game;
 
 import com.orangelight.monopolyserver.Main.Game.Player.*;
 import com.orangelight.monopolyserver.Main.Game.Board.*;
+import com.orangelight.monopolyserver.Main.Game.Board.Tiles.Tile;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -99,7 +100,6 @@ public class GameInstance {
         if (!currentPlayer.isJailed()) {
             if(!noRollJail) {
                 setCurrentDiceRoll(Board.rollDice());
-                
             } else {
                 setNotRollJail(false);
             }
@@ -207,12 +207,121 @@ public class GameInstance {
          }
     }
     
-    private void populateChanceCards() {
-        
+    private void populateChanceCards() throws FileNotFoundException, IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader( getClass().getClassLoader().getResource("ChanceData.csv").getFile()))) {
+            for (String line; (line = br.readLine()) != null;) {
+                String[] lineData=  line.split(",");
+                chance.add(getCardFromLine(lineData));
+            }
+         }
     }
     
     private void populateCommunityCards() {
         
+    }
+    
+    private CCard getCardFromLine(String[] s) {
+        int type = Integer.parseInt(s[1]);
+        if (type == 0) { //Bank Pays you money
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}){
+
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    currentPlayer.addCash(getData()[0]);
+                }
+            };
+        } else if (type == 1) {//You pay money to bank
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, getData()[0]));
+                }
+            };
+        } else if(type == 2) {//Go to place
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3]), Integer.parseInt(s[4])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                     currentPlayer.moveTo(getData()[0], (getData()[1]==1));
+                     game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).action(game, currentPlayer);
+                }
+            };
+        } else if(type == 3) {//Go back spaces
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                     currentPlayer.moveTo(currentPlayer.getCurrentTileID() - getData()[0], false);
+                     game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).action(game, currentPlayer);
+                }
+            };
+        } else if(type == 4) {//Find nearist utility
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                     currentPlayer.moveTo(findNearestUtility(currentPlayer.getCurrentTileID()), false);
+                     game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).action(game, currentPlayer);//Some how make us pay ten times amount
+                }
+            };
+        } else if(type == 5) {//Find nearist railroad
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                     currentPlayer.moveTo(findNearestRailRoad(currentPlayer.getCurrentTileID()), false);
+                     game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).action(game, currentPlayer);//Some how make us pay two times amount
+                }
+            };
+        } else if (type == 6) {//Pay for each house and hotel
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3]), Integer.parseInt(s[4])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    int numHouses = 0, numHotels = 0;
+                    for(PlayerProperty p : game.properties) {
+                        if(p.getOwnerID() != null && currentPlayer.getPlayerID().equals(p.getOwnerID())) {
+                            if(p.hasHotel()) numHotels++;
+                            else numHouses+=p.getHouses();
+                        }
+                    }
+                    currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, (getData()[0]*numHouses)+(getData()[1]*numHotels)));
+                }
+            };
+        } else if (type == 7) {//Pay each player
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    throw new UnsupportedOperationException();//Need to rework the debt system
+                }
+            };
+        } else if (type == 8) {//Go to jail
+            return new CCard(Integer.parseInt(s[0]), type, s[2], null) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    currentPlayer.jailPlayer(game);
+                }
+            };
+        } else if(type ==9) {//get out of jail card
+            return new CCard(Integer.parseInt(s[0]), type, s[2], null) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    this.setOwner(currentPlayer.getPlayerID());
+                }
+            };
+        } else if (type == 10) {//Each player gives you
+            return new CCard(Integer.parseInt(s[0]), type, s[2], new int[]{Integer.parseInt(s[3])}) {
+                
+                @Override
+                public void action(GameInstance game, Player currentPlayer) {
+                    throw new UnsupportedOperationException();//Need to rework the debt system...
+                }
+            };
+        }
     }
     
     public Player getCurrentPlayer() {
@@ -290,5 +399,67 @@ public class GameInstance {
              communityIndex++;
              return pullChanceCard();
          }
+     }
+     
+     public int findNearestUtility(int currentPos) {
+         int min = 100, minID = -1;
+         for(PlayerProperty prop : properties) {
+             if(prop.isUtilitie()) {
+                 for(Tile t : this.getBoard().getTiles()) {
+                     if(t.getPropertyID() == prop.getID()) {
+                         if(t.getID() < currentPos) {//We passed the util
+                             if(currentPos-t.getID() < min && currentPos-t.getID() < 20) {
+                                 min = currentPos-t.getID();
+                                 minID = t.getID();
+                             } else if(currentPos-t.getID() > 20 && 40 - (currentPos-t.getID()) < min) {
+                                 min = 40 - (currentPos-t.getID());
+                                 minID = t.getID();
+                             }
+                         } else { //Ahead of us
+                             if(t.getID()-currentPos < 20 && t.getID()-currentPos < min) {
+                                 min = t.getID()-currentPos;
+                                 minID = t.getID();
+                             } else if(t.getID()-currentPos > 20 && 40-(t.getID()-currentPos) < min) {
+                                 min = 40-(t.getID()-currentPos);
+                                 minID = t.getID();
+                             }
+                         }
+                         break;
+                     }
+                 }
+             }
+         }
+         return minID;
+     }
+     
+     public int findNearestRailRoad(int currentPos) {
+         int min = 100, minID = -1;
+         for(PlayerProperty prop : properties) {
+             if(prop.isRailroad()) {
+                 for(Tile t : this.getBoard().getTiles()) {
+                     if(t.getPropertyID() == prop.getID()) {
+                         if(t.getID() < currentPos) {//We passed the util
+                             if(currentPos-t.getID() < min && currentPos-t.getID() < 20) {
+                                 min = currentPos-t.getID();
+                                 minID = t.getID();
+                             } else if(currentPos-t.getID() > 20 && 40 - (currentPos-t.getID()) < min) {
+                                 min = 40 - (currentPos-t.getID());
+                                 minID = t.getID();
+                             }
+                         } else { //Ahead of us
+                             if(t.getID()-currentPos < 20 && t.getID()-currentPos < min) {
+                                 min = t.getID()-currentPos;
+                                 minID = t.getID();
+                             } else if(t.getID()-currentPos > 20 && 40-(t.getID()-currentPos) < min) {
+                                 min = 40-(t.getID()-currentPos);
+                                 minID = t.getID();
+                             }
+                         }
+                         break;
+                     }
+                 }
+             }
+         }
+         return minID;
      }
 }

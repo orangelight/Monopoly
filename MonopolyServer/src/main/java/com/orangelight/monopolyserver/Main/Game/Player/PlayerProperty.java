@@ -54,6 +54,14 @@ public class PlayerProperty {
          return colorID;
      }
      
+     public int getID() {
+         return id;
+     }
+     
+     public int getHouses() { return this.houses; }
+     
+     public boolean hasHotel() { return this.hotel; }
+     
      public String getOwnerID() { return this.ownerID; }
      public int getPrice() { return this.price; }
      
