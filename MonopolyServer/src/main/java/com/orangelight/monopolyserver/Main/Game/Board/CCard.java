@@ -7,12 +7,13 @@ package com.orangelight.monopolyserver.Main.Game.Board;
 
 import com.orangelight.monopolyserver.Main.Game.GameInstance;
 import com.orangelight.monopolyserver.Main.Game.Player.Player;
+import com.orangelight.monopolyserver.Main.Game.Tradable;
 
 /**
  *
  * @author Alex
  */
-public abstract class CCard {
+public abstract class CCard implements Tradable{
     private int id, typeID;
     private String description, ownerID;
     private int[] data;

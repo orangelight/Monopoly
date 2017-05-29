@@ -12,6 +12,7 @@ import com.orangelight.monopolyserver.Main.Game.Board.Board;
 import com.orangelight.monopolyserver.Main.Game.Board.CCard;
 import com.orangelight.monopolyserver.Main.Game.Board.Tiles.*;
 import com.orangelight.monopolyserver.Main.Game.Player.*;
+import com.orangelight.monopolyserver.Main.Game.Trade;
 import java.io.IOException;
 import java.util.ArrayList;
 import spark.Request;
@@ -74,7 +75,7 @@ public class MonopolyServer {
                      PlayerProperty prop =  game.getPlayerProperty(currentPlayer.getAcution().getPropertyID());
                      if(currentPlayer.canSubCash(prop.getPrice())) {
                          currentPlayer.addCash(-prop.getPrice());
-                         prop.setOwner(currentPlayer);
+                         prop.setOwner(currentPlayer.getPlayerID());
                          currentPlayer.setAcution(null);
                          return "Bought";
                      } else return "You don't have enough money";
@@ -216,8 +217,9 @@ public class MonopolyServer {
         
         put("/buyhotel/:id", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
-            if(isNumeric(request.params("id"))) {
+           
                 if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                     if(isNumeric(request.params("id"))) {
                     int id = Integer.parseInt(request.params("id"));
                     if(id < 40 && id > -1) {
                         PlayerProperty prop = game.getPlayerProperty(id);
@@ -238,11 +240,39 @@ public class MonopolyServer {
                     } else {
                         return "Not a vaild id";
                     }
-                   
+                   } else return "That is not a number..."; 
                 } else return "Not your turn";
-            } else return "That is not a number...";
+            
              
         });
+        put("/requesttrade/:clientID/:ownerCash/:clientCash/:ownerProp/:clientProp/:ownerchanceID/:clientchanceID/:ownercommunityID/:clientcommunityID", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                if (isNumeric(request.params("ownerCash")) && isNumeric(request.params("clientCash")) && isParamCorrectFormat(request.params("ownerProp")) && isParamCorrectFormat(request.params("clientProp"))) {
+                    if (game.doesPlayerExsist(request.params("clientID"))) {
+                        Trade trade = new Trade();
+                        if (currentPlayer.canSubCash(Integer.parseInt(request.params("ownerCash")))) {
+                            
+                        }
+                    } else {
+                        return "Client does not exsist";
+                    }
+                    return null;
+                } else {
+                    return "Not correct format";
+                }
+            } else {
+                return "Not your turn";
+            }
+        });
+    }
+    
+    public static boolean isParamCorrectFormat(String s) {
+        String[] data = s.split(",");
+        for(String number : data) {
+            if(!isNumeric(number)) return false;
+        }
+        return true;
     }
     
     public static boolean isNumeric(String str) {

@@ -481,4 +481,11 @@ public class GameInstance {
           }
           return houseSum;
       }
+      
+      public boolean doesPlayerExsist(String s) {
+        if (players.stream().anyMatch((p) -> (p.getPlayerID().equals(s)))) {
+            return true;
+        }
+          return false;
+      }
 }
