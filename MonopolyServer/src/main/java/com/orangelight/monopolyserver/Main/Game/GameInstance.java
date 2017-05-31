@@ -22,6 +22,7 @@ public class GameInstance {
     private int doubleDiceNum = 0, chanceIndex =0, communityIndex = 0;
     private boolean eligibleForRollAgain, noRollJail = false;
     private ArrayList<CCard> chance, community;
+    private Trade currentTrade;
     
     public GameInstance(Board b) throws IOException {
         properties = new ArrayList<>();
@@ -55,6 +56,14 @@ public class GameInstance {
     
     public void setEligibleForRollAgain(boolean b) {
         this.eligibleForRollAgain = b;
+    }
+    
+    public Trade getCurrentTrade() {
+        return currentTrade;
+    }
+    
+    public void setCurrentTrade(Trade t) {
+        this.currentTrade = t;
     }
     
     public Player getNextPlayer() {
@@ -167,6 +176,7 @@ public class GameInstance {
     public int getCurrentDiceRollSum() {return currentDiceRoll[0]+currentDiceRoll[1];}
     
     public PlayerProperty getPlayerProperty(int id) {
+        if(id < 0 || id > properties.size()-1) return null;
         return properties.get(id);
     }
     
@@ -487,5 +497,15 @@ public class GameInstance {
             return true;
         }
           return false;
+      }
+      
+      public static boolean isPropTradable(PlayerProperty prop, String owner, GameInstance game) {
+          if(prop != null && prop.getOwnerID()!= null) {
+              if(!prop.getOwnerID().equals(owner)) return false;
+              for(PlayerProperty p : game.properties) {
+                  if(p.getColorID()==prop.getColorID() &&(p.getHouses() > 0 || p.hasHotel())) return false;
+              }
+              return true;
+          } else return false;
       }
 }

@@ -250,14 +250,83 @@ public class MonopolyServer {
             if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                 if (isNumeric(request.params("ownerCash")) && isNumeric(request.params("clientCash")) && isParamCorrectFormat(request.params("ownerProp")) && isParamCorrectFormat(request.params("clientProp"))) {
                     if (game.doesPlayerExsist(request.params("clientID"))) {
-                        Trade trade = new Trade();
+                        Trade trade = new Trade(currentPlayer.getPlayerID(), request.params("clientID"));
                         if (currentPlayer.canSubCash(Integer.parseInt(request.params("ownerCash")))) {
-                            
+                            trade.setOwnerCash(Integer.parseInt(request.params("ownerCash")));
+                        } else return "You don't have enough money";
+                        if (currentPlayer.canSubCash(Integer.parseInt(request.params("clientCash")))) {
+                            trade.setOwnerCash(Integer.parseInt(request.params("clientCash")));
+                        } else return "Your client doesn't have enough money";
+                        if(!request.params("ownerProp").equals("-1")) {
+                            PlayerProperty[] propList = getPropertiesFromParam(game, request.params("ownerProp"));
+                            for(PlayerProperty prop : propList) {
+                                if(GameInstance.isPropTradable(prop, currentPlayer.getPlayerID(), game)) {
+                                    trade.addOwnerTradable(prop);
+                                } else return "Error with owner properties";
+                            }
                         }
+                       if(!request.params("clientProp").equals("-1")) {
+                            PlayerProperty[] propList = getPropertiesFromParam(game, request.params("clientProp"));
+                            for(PlayerProperty prop : propList) {
+                                if(GameInstance.isPropTradable(prop, trade.getClientID(), game)) {
+                                    trade.addClientTradable(prop);
+                                } else return "Error with cleint properties";
+                            }
+                        }
+                        if(!request.params("ownerchanceID").equals("-1")) {
+                            int id = Integer.parseInt(request.params("ownerchanceID"));
+                            for(CCard c : game.getChanceCards()) {
+                                if(c.getID()==id) {
+                                    if(c.getType()!=9) return "Can't trade this card";
+                                    if(!c.isTaken()) return "No one owns this card";
+                                    if(!c.getOwnerID().equals(currentPlayer.getPlayerID())) return "You do not own this card";
+                                    trade.addClientTradable(c);
+                                    break;
+                                }
+                            }
+                        }
+                        if(!request.params("clientchanceID").equals("-1")) {
+                             int id = Integer.parseInt(request.params("clientchanceID"));
+                            for(CCard c : game.getChanceCards()) {
+                                if(c.getID()==id) {
+                                    if(c.getType()!=9) return "Can't trade this card";
+                                    if(!c.isTaken()) return "No one owns this card";
+                                    if(!c.getOwnerID().equals(trade.getClientID())) return "You do not own this card";
+                                    trade.addClientTradable(c);
+                                    break;
+                                }
+                            }
+                        }
+                        if(!request.params("ownercommunityID").equals("-1")) {
+                            int id = Integer.parseInt(request.params("ownercommunityID"));
+                            for(CCard c : game.getCommunityCards()) {
+                                if(c.getID()==id) {
+                                    if(c.getType()!=9) return "Can't trade this card";
+                                    if(!c.isTaken()) return "No one owns this card";
+                                    if(!c.getOwnerID().equals(currentPlayer.getPlayerID())) return "You do not own this card";
+                                    trade.addClientTradable(c);
+                                    break;
+                                }
+                            }
+                        }
+                        if(!request.params("clientcommunityID").equals("-1")) {
+                            int id = Integer.parseInt(request.params("clientcommunityID"));
+                            for(CCard c : game.getCommunityCards()) {
+                                if(c.getID()==id) {
+                                    if(c.getType()!=9) return "Can't trade this card";
+                                    if(!c.isTaken()) return "No one owns this card";
+                                    if(!c.getOwnerID().equals(trade.getClientID())) return "You do not own this card";
+                                    trade.addClientTradable(c);
+                                    break;
+                                }
+                            }
+                        }
+                        if(trade.getClientItemsSize() == 0 && trade.getOwnerItemsSize()==0) return "You can't just trade cash";
+                        game.setCurrentTrade(trade);
+                        return "Trade requested";
                     } else {
                         return "Client does not exsist";
                     }
-                    return null;
                 } else {
                     return "Not correct format";
                 }
@@ -265,7 +334,32 @@ public class MonopolyServer {
                 return "Not your turn";
             }
         });
+   
+        put("/tradeaccept", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                    game.getCurrentTrade().accept();
+                    game.setCurrentTrade(null);
+                    return "You traded";
+            } else {
+                return "Not your turn";
+            }
+
+        });
+        
+        put("/tradecancel", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                    game.setCurrentTrade(null);
+                    return "Trade canceled";
+            } else {
+                return "Not your turn";
+            }
+
+        });
     }
+    
+
     
     public static boolean isParamCorrectFormat(String s) {
         String[] data = s.split(",");
@@ -277,6 +371,15 @@ public class MonopolyServer {
     
     public static boolean isNumeric(String str) {
         return str.matches("-?\\d+(\\.\\d+)?");  //match a number with optional '-' and decimal.
+    }
+    
+    public static PlayerProperty[] getPropertiesFromParam(GameInstance game, String s) {
+        String[] stringArrayProps = s.split(",");
+        PlayerProperty[] pArray = new PlayerProperty[stringArrayProps.length];
+        for(int i = 0; i < stringArrayProps.length; i++) {
+            pArray[i] = game.getPlayerProperty(i);
+        }
+        return pArray;
     }
     
 }
