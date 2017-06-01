@@ -50,6 +50,7 @@ public class MonopolyServer {
         put("/endTurn", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                if(game.getCurrentTrade()!=null) return "On going trade";
                 if(!currentPlayer.isJailed()) {
                  if(!currentPlayer.isInDebt()) {
                      currentPlayer.endTurn();
@@ -352,6 +353,56 @@ public class MonopolyServer {
             if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                     game.setCurrentTrade(null);
                     return "Trade canceled";
+            } else {
+                return "Not your turn";
+            }
+
+        });
+        
+        put("/mortgage/:id", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                if(isNumeric(request.params("id"))) {
+                    PlayerProperty prop = game.getPlayerProperty(Integer.parseInt(request.params("id")));
+                    if(prop != null && prop.getOwnerID() != null && prop.getOwnerID().equals(currentPlayer.getPlayerID()) && !prop.hasHotel() && prop.getHouses()==0 && !prop.isMortgaged()) {
+                        for (PlayerProperty colorProp : game.getPlayerProperties()) {
+                            if (colorProp.getColorID() == prop.getColorID() && prop.getID() != colorProp.getID()) {
+                                if (prop.hasHotel() || prop.getHouses() > 0) {
+                                    return "Must sell all buildings on color group";
+                                }
+                            }
+                        }
+                        prop.setMortgage(true);
+                        currentPlayer.addCash(prop.getPrice()/2);
+                        return "Mortgaged";
+                    } else {
+                        return "Error validating property";
+                    }
+                } else return "Not valid id";
+            } else {
+                return "Not your turn";
+            }
+
+        });
+        
+        put("/unmortgage/:id", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                if(isNumeric(request.params("id"))) {
+                    PlayerProperty prop = game.getPlayerProperty(Integer.parseInt(request.params("id")));
+                    if(prop != null && prop.getOwnerID() != null && prop.getOwnerID().equals(currentPlayer.getPlayerID()) && prop.isMortgaged()) {
+                        int amount = (int)((prop.getPrice()/2)*1.1);
+                        if(currentPlayer.canSubCash(amount)) {
+                            currentPlayer.addCash(-amount);
+                            prop.setMortgage(false);
+                        } else {
+                            return "Don't have enough money";
+                        }
+                        return "Un-Mortgaged";
+                    } else {
+                        return "Error validating property";
+                    }
+                } else return "Not valid id";
             } else {
                 return "Not your turn";
             }

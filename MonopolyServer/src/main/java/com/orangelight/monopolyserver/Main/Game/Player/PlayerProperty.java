@@ -30,6 +30,7 @@ public class PlayerProperty implements Tradable{
          this.houseCost = houseCost;
          this.railroad = railRoad;
          this.utilitie = utilitie; 
+         this.mortgaged = false;
      }
      
      /**
@@ -57,6 +58,10 @@ public class PlayerProperty implements Tradable{
      
      public int getID() {
          return id;
+     }
+     
+     public void setMortgage(boolean b) {
+         this.mortgaged = b;
      }
      
      public int getHouses() { return this.houses; }

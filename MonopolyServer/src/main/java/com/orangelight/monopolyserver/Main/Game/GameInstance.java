@@ -464,9 +464,10 @@ public class GameInstance {
      
      public boolean canPutHouse(PlayerProperty propColor) {
          if(propColor.getHouses() == 4 || numberOfHouses() > 31) return false;//Can't have more than 4 houses
+         if(propColor.isMortgaged()) return false;
          for(PlayerProperty p: properties) {
              if(p.getColorID() == propColor.getColorID() && propColor.getID() != p.getID()) {
-                 if(Math.abs((propColor.getHouses()+1)-p.getHouses()) > 1) {
+                 if(Math.abs((propColor.getHouses()+1)-p.getHouses()) > 1 || p.isMortgaged()) {
                      return false;
                  }
              }
@@ -475,7 +476,7 @@ public class GameInstance {
      }
      
       public boolean canPutHotel(PlayerProperty propColor) {
-         if(propColor.getHouses() < 4 || propColor.hasHotel()) return false;
+         if(propColor.getHouses() < 4 || propColor.hasHotel() || numberOfHotels() > 11) return false;
          for(PlayerProperty p: properties) {
              if(p.getColorID() == propColor.getColorID() && propColor.getID() != p.getID()) {
                  if(!p.hasHotel() && p.getHouses() < 4) return false;
@@ -490,6 +491,14 @@ public class GameInstance {
               if(p.getOwnerID()!=null) houseSum+=p.getHouses();
           }
           return houseSum;
+      }
+      
+       public int numberOfHotels() {
+          int hotelSum = 0;
+          for(PlayerProperty p : properties) {
+              if(p.getOwnerID()!=null && p.hasHotel()) hotelSum++;
+          }
+          return hotelSum;
       }
       
       public boolean doesPlayerExsist(String s) {
@@ -507,5 +516,9 @@ public class GameInstance {
               }
               return true;
           } else return false;
+      }
+      
+      public ArrayList<PlayerProperty> getPlayerProperties() {
+          return this.properties;
       }
 }
