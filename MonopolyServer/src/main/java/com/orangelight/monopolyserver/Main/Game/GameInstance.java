@@ -1,5 +1,6 @@
 package com.orangelight.monopolyserver.Main.Game;
 
+import com.orangelight.monopolyserver.Main.Game.Auction.Auction;
 import com.orangelight.monopolyserver.Main.Game.Player.*;
 import com.orangelight.monopolyserver.Main.Game.Board.*;
 import com.orangelight.monopolyserver.Main.Game.Board.Tiles.Tile;
@@ -23,6 +24,7 @@ public class GameInstance {
     private boolean eligibleForRollAgain, noRollJail = false;
     private ArrayList<CCard> chance, community;
     private Trade currentTrade;
+    private Auction currentAuction;
     
     public GameInstance(Board b) throws IOException {
         properties = new ArrayList<>();
@@ -54,6 +56,9 @@ public class GameInstance {
         return p;
     }
     
+    public void setCurrentAuction(Auction a) { this.currentAuction = a;}
+    public Auction getCurrentAuction() { return this.currentAuction; }
+    
     public void setEligibleForRollAgain(boolean b) {
         this.eligibleForRollAgain = b;
     }
@@ -65,6 +70,8 @@ public class GameInstance {
     public void setCurrentTrade(Trade t) {
         this.currentTrade = t;
     }
+    
+    public ArrayList<Player> getPlayers() { return this.players; }
     
     public Player getNextPlayer() {
         Player lastPlayer = players.get(getCurrentPlayerIndex());

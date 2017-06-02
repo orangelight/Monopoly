@@ -16,7 +16,6 @@ public class Player {
     private int cash, positionID, jailTurn;
     private boolean bankrupt, currentTurn, jail;
     private Debt currentDebt;
-    private PropertyAuction currentPropertyAuction;
 
     public Player(String id) {
         this.playerID = id;
@@ -74,16 +73,14 @@ public class Player {
     }
     
     public void endTurn() {
-        setAcution(null);
+       
     }
     
     public void setDebt(Debt d) {
         this.currentDebt = d;
     }
     
-    public void setAcution(PropertyAuction p) {
-        this.currentPropertyAuction = p;
-    }
+   
     
     public boolean isInDebt() { return this.currentDebt != null; }
     
@@ -91,9 +88,7 @@ public class Player {
     
     public int getCash() { return this.cash; }
     
-    public PropertyAuction getAcution() {
-        return this.currentPropertyAuction;
-    }
+    
     
     public Debt getDebt() {
         return this.currentDebt;

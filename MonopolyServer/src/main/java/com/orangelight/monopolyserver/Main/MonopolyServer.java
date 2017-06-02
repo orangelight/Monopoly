@@ -7,6 +7,8 @@ package com.orangelight.monopolyserver.Main;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.orangelight.monopolyserver.Main.Game.Auction.Auction;
+import com.orangelight.monopolyserver.Main.Game.Auction.Bid;
 import com.orangelight.monopolyserver.Main.Game.GameInstance;
 import com.orangelight.monopolyserver.Main.Game.Board.Board;
 import com.orangelight.monopolyserver.Main.Game.Board.CCard;
@@ -72,12 +74,11 @@ public class MonopolyServer {
         put("/buyproperty", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                 if(currentPlayer.getAcution() != null) {
-                     PlayerProperty prop =  game.getPlayerProperty(currentPlayer.getAcution().getPropertyID());
+                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).getOwnerID() == null) {
+                     PlayerProperty prop =  game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID());
                      if(currentPlayer.canSubCash(prop.getPrice())) {
                          currentPlayer.addCash(-prop.getPrice());
                          prop.setOwner(currentPlayer.getPlayerID());
-                         currentPlayer.setAcution(null);
                          return "Bought";
                      } else return "You don't have enough money";
                  } else return "You can't buy this";
@@ -85,6 +86,46 @@ public class MonopolyServer {
                 return "Not your turn";
             }
         });
+        
+        put("/auctionproperty", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).getOwnerID() == null) {
+                     PlayerProperty prop =  game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID());
+                     game.setCurrentAuction(new Auction(prop));
+                    return "Auctioned";
+                 } else return "You can't Auction this";
+            } else {
+                return "Not your turn";
+            }
+        });
+        
+        put("/bid/:amount", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                 if(game.getCurrentAuction() != null && game.getCurrentAuction().hasPlayerPlacedBid(request.headers("id"))) {
+                     if(isNumeric(request.params("amount"))) {
+                         int amount = Integer.parseInt(request.params("amount"));
+                         if(game.getPlayerFromID(request.headers("id")).canSubCash(amount)) { //Check if game.getPlayerFromID() is null***********
+                             game.getCurrentAuction().addBid(new Bid(amount, game.getPlayerFromID(request.headers("id"))));
+                             if(game.getCurrentAuction().canStartAuction(game)) {
+                                game.getCurrentAuction().auction();
+                             }
+                             return "Bid Placed";
+                         } else {
+                             return "Don't have enough money";
+                         }
+                     } else {
+                         return "amount not a number";
+                     }
+                 } else {
+                     return "Can't Bid";
+                 }
+                 
+            } else {
+                return "Not your turn";
+            }
+        }); 
         
         put("/paydebt", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
@@ -403,6 +444,17 @@ public class MonopolyServer {
                         return "Error validating property";
                     }
                 } else return "Not valid id";
+            } else {
+                return "Not your turn";
+            }
+
+        });
+        
+        put("/bid", (request, response) -> {
+            Player currentPlayer = game.getCurrentPlayer();
+            if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
+                    game.setCurrentTrade(null);
+                    return "Trade canceled";
             } else {
                 return "Not your turn";
             }

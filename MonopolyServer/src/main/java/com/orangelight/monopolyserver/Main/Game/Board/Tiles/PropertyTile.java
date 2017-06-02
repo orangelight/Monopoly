@@ -9,7 +9,6 @@ import com.orangelight.monopolyserver.Main.Game.GameInstance;
 import com.orangelight.monopolyserver.Main.Game.Player.Debt;
 import com.orangelight.monopolyserver.Main.Game.Player.Player;
 import com.orangelight.monopolyserver.Main.Game.Player.PlayerProperty;
-import com.orangelight.monopolyserver.Main.Game.Player.PropertyAuction;
 
 /**
  *
@@ -34,7 +33,7 @@ public class PropertyTile extends Tile {
             }
             
         } else if(!propData.isOwned()) { //Property is not owned
-            currentPlayer.setAcution(new PropertyAuction(getPropertyID()));
+           
         } 
     }
 }
