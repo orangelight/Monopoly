@@ -229,7 +229,7 @@ public class GameInstance {
                 
                 @Override
                 public void action(GameInstance game, Player currentPlayer) {
-                    currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, getData()[0]));
+                    currentPlayer.addCash(-getData()[0]);
                 }
             };
         } else if(type == 2) {//Go to place
@@ -275,13 +275,13 @@ public class GameInstance {
                 public void action(GameInstance game, Player currentPlayer) {
                     int numHouses = 0, numHotels = 0;
                     for(PlayerProperty p : game.properties) {
-                        if(p.getOwnerID() != null && currentPlayer.getPlayerID().equals(p.getOwnerID())) {
+                        if(p.getOwner() != null && currentPlayer.equals(p.getOwner())) {
                             if(p.hasHotel()) numHotels++;
                             else numHouses+=p.getHouses();
                         }
                     }
                     if(numHotels!=0&numHouses!=0) {
-                        currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, (getData()[0]*numHouses)+(getData()[1]*numHotels)));
+                        currentPlayer.addCash(-(getData()[0]*numHouses)+(getData()[1]*numHotels));
                     }
                     
                 }
@@ -307,7 +307,7 @@ public class GameInstance {
                 
                 @Override
                 public void action(GameInstance game, Player currentPlayer) {
-                    this.setOwner(currentPlayer.getPlayerID());
+                    this.setOwner(currentPlayer);
                 }
             };
         } else if (type == 10) {//Each player gives you
@@ -348,31 +348,31 @@ public class GameInstance {
         return null;
     }
     
-    public int getPlayerRRNumberForRent(String id) {
+    public int getPlayerRRNumberForRent(Player p) {
         int numOfRR = 0;
         for(PlayerProperty prop : properties) {
             if(prop.isRailroad()) {
-                if(prop.getOwnerID()!= null && prop.getOwnerID().equals(id)) numOfRR++;
+                if(prop.getOwner()!= null && prop.getOwner().equals(p)) numOfRR++;
             }
         }
         return numOfRR;
     }
     
-     public int getPlayerUtilNumberForRent(String id) {
+     public int getPlayerUtilNumberForRent(Player p) {
         int numOfUtil = 0;
         for(PlayerProperty prop : properties) {
             if(prop.isUtilitie()) {
-                if(prop.getOwnerID()!= null && prop.getOwnerID().equals(id)) numOfUtil++;
+                if(prop.isOwned() && prop.getOwner().equals(p)) numOfUtil++;
             }
         }
         return numOfUtil;
     }
      
-     public boolean doesPlayerOwnAllColor(String id, PlayerProperty propColor) {
+     public boolean doesPlayerOwnAllColor(Player p, PlayerProperty propColor) {
           for(PlayerProperty prop : properties) {
               if(!prop.isRailroad() && !prop.isUtilitie() && prop.getColorID() == propColor.getColorID()) {
-                  if(prop.getOwnerID()== null) return false;
-                  else if(!prop.getOwnerID().equals(id)) return false;
+                  if(!prop.isOwned()) return false;
+                  else if(!prop.getOwner().equals(p)) return false;
               }
           }
           return true;
@@ -495,7 +495,7 @@ public class GameInstance {
       public int numberOfHouses() {
           int houseSum = 0;
           for(PlayerProperty p : properties) {
-              if(p.getOwnerID()!=null) houseSum+=p.getHouses();
+              if(p.isOwned()) houseSum+=p.getHouses();
           }
           return houseSum;
       }
@@ -503,7 +503,7 @@ public class GameInstance {
        public int numberOfHotels() {
           int hotelSum = 0;
           for(PlayerProperty p : properties) {
-              if(p.getOwnerID()!=null && p.hasHotel()) hotelSum++;
+              if(p.isOwned() && p.hasHotel()) hotelSum++;
           }
           return hotelSum;
       }
@@ -515,9 +515,9 @@ public class GameInstance {
           return false;
       }
       
-      public static boolean isPropTradable(PlayerProperty prop, String owner, GameInstance game) {
-          if(prop != null && prop.getOwnerID()!= null) {
-              if(!prop.getOwnerID().equals(owner)) return false;
+      public static boolean isPropTradable(PlayerProperty prop, Player owner, GameInstance game) {
+          if(prop != null && prop.isOwned()) {
+              if(!prop.getOwner().equals(owner)) return false;
               for(PlayerProperty p : game.properties) {
                   if(p.getColorID()==prop.getColorID() &&(p.getHouses() > 0 || p.hasHotel())) return false;
               }

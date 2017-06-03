@@ -6,7 +6,6 @@
 package com.orangelight.monopolyserver.Main.Game.Board.Tiles;
 
 import com.orangelight.monopolyserver.Main.Game.GameInstance;
-import com.orangelight.monopolyserver.Main.Game.Player.Debt;
 import com.orangelight.monopolyserver.Main.Game.Player.Player;
 import com.orangelight.monopolyserver.Main.Game.Player.PlayerProperty;
 
@@ -23,17 +22,12 @@ public class PropertyTile extends Tile {
     @Override
     public void action(GameInstance game, Player currentPlayer) {
         PlayerProperty propData = game.getPlayerProperty(getPropertyID());
-        if(propData.isOwned() && !propData.isMortgaged() && !propData.getOwnerID().equals(currentPlayer.getPlayerID())) {//Have to make player pay money to property owner
+        if(propData.isOwned() && !propData.isMortgaged() && !propData.getOwner().equals(currentPlayer)) {//Have to make player pay money to property owner
             int rent = propData.getRent(game);
-            if(currentPlayer.canSubCash(rent)) {
-                currentPlayer.addCash(-rent);
-                game.getPlayerFromID(propData.getOwnerID()).addCash(rent);
-            } else {
-                currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), propData.getOwnerID(), rent));
-            }
-            
+            currentPlayer.addCash(-rent);
+            propData.getOwner().addCash(rent);
         } else if(!propData.isOwned()) { //Property is not owned
-           
+            
         } 
     }
 }

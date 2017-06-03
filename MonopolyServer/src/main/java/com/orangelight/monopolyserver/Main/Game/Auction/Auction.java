@@ -29,21 +29,21 @@ public class Auction {
         this.bids.add(b);
     }
     
-    public boolean hasPlayerPlacedBid(String s) {
+    public boolean hasPlayerPlacedBid(Player p) {
         for(Bid b : bids) {
-            if(b.getOwner().getPlayerID().equals(s)) return true;
+            if(b.getOwner().equals(p)) return true;
         }
         return false;
     }
     
     public boolean canStartAuction(GameInstance game) {
         for(Player p : game.getPlayers()) {
-            if(!p.isBankrupt() && !hasPlayerPlacedBid(p.getPlayerID())) return false;
+            if(!p.isBankrupt() && !hasPlayerPlacedBid(p)) return false;
         }
         return true;
     }
     
     public void auction() {
-        item.setOwner(Collections.max(bids).getOwner().getPlayerID());
+        item.setOwner(Collections.max(bids).getOwner());
     }
 }

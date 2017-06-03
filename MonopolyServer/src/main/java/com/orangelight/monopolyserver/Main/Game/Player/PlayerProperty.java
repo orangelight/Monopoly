@@ -14,8 +14,8 @@ import com.orangelight.monopolyserver.Main.Game.Tradable;
  */
 public class PlayerProperty implements Tradable{
      private int id, houses, price, colorID, baseRent, oneHouseRent, twoHouseRent, threeHouseRent, fourHouseRent, hotelRent, houseCost;
-     private boolean mortgaged, utilitie, railroad, hotel;
-     private String ownerID;
+     private boolean mortgaged, utilitie, railroad, hotel, traded;
+     private Player owner;
      
      public PlayerProperty(int id, int color, int price, int rent, int rent1H, int rent2H, int rent3H, int rent4H, int rentHotel, int houseCost, boolean railRoad, boolean utilitie) {
          this.id = id;
@@ -31,6 +31,7 @@ public class PlayerProperty implements Tradable{
          this.railroad = railRoad;
          this.utilitie = utilitie; 
          this.mortgaged = false;
+         this.traded = false;
      }
      
      /**
@@ -38,7 +39,7 @@ public class PlayerProperty implements Tradable{
       * @return 
       */
      public boolean isOwned() {
-         return ownerID != null;
+         return owner != null;
      }
      
      public boolean isMortgaged() {
@@ -47,6 +48,9 @@ public class PlayerProperty implements Tradable{
      public boolean isRailroad() {
          return railroad;
      }
+     
+     public boolean isJustTraded() { return this.traded; }
+     public void setJustTraded(boolean b) { this.traded = b;}
      
      public boolean isUtilitie() {
          return utilitie;
@@ -68,7 +72,7 @@ public class PlayerProperty implements Tradable{
      
      public boolean hasHotel() { return this.hotel; }
      
-     public String getOwnerID() { return this.ownerID; }
+     public Player getOwner() { return this.owner; }
      public int getPrice() { return this.price; }
      
      public int getHouseCost() { return this.houseCost; }
@@ -80,7 +84,7 @@ public class PlayerProperty implements Tradable{
      public int getRent(GameInstance g) {
          if (!this.railroad && !this.utilitie) {
              if (houses == 0 && !hotel) {
-                 if(g.doesPlayerOwnAllColor(ownerID, this)) return this.baseRent*2;
+                 if(g.doesPlayerOwnAllColor(this.getOwner(), this)) return this.baseRent*2;
                  else return this.baseRent;
              } else if (houses == 1) {
                  return this.oneHouseRent;
@@ -94,7 +98,7 @@ public class PlayerProperty implements Tradable{
                  return this.hotelRent;
              }
          } else if (this.railroad) {
-             int num = g.getPlayerRRNumberForRent(this.getOwnerID());
+             int num = g.getPlayerRRNumberForRent(this.getOwner());
              if (num == 1) {
                  return this.oneHouseRent;
              } else if (num == 2) {
@@ -107,7 +111,7 @@ public class PlayerProperty implements Tradable{
                  return 0;
              }
          } else if (this.utilitie) {
-             int num = g.getPlayerUtilNumberForRent(this.getOwnerID());
+             int num = g.getPlayerUtilNumberForRent(this.getOwner());
              if (num == 1) {
                  return this.oneHouseRent*g.getCurrentDiceRollSum();
              } else if (num == 2) {
@@ -121,5 +125,5 @@ public class PlayerProperty implements Tradable{
          
      }
      
-     public void setOwner(String s) { this.ownerID = s;}
+     public void setOwner(Player p) { this.owner = p;}
 }

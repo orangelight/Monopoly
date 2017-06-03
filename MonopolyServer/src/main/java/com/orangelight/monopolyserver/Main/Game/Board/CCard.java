@@ -15,8 +15,9 @@ import com.orangelight.monopolyserver.Main.Game.Tradable;
  */
 public abstract class CCard implements Tradable{
     private int id, typeID;
-    private String description, ownerID;
+    private String description;
     private int[] data;
+    private Player owner;
     
     public CCard(int id, int type, String desc, int[] data) {
         this.id = id;
@@ -25,11 +26,11 @@ public abstract class CCard implements Tradable{
     }
     
     public int getID() { return this.id;}
-    public boolean isTaken() { return ownerID!=null; }
-    public void setOwner(String id) { this.ownerID = id; }
+    public boolean isTaken() { return owner!=null; }
+    public void setOwner(Player p) { this.owner = p; }
     public int[] getData() { return this.data; }
-    public String getOwnerID() { return this.ownerID; }
-    public int getType() { return this.getType(); }
+    public Player getOwner() { return this.owner; }
+    public int getType() { return this.typeID; }
     
     public abstract void action(GameInstance game, Player currentPlayer);
 }

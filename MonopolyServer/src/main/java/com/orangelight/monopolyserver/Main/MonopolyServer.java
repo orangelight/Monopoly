@@ -53,6 +53,14 @@ public class MonopolyServer {
             Player currentPlayer = game.getCurrentPlayer();
             if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                 if(game.getCurrentTrade()!=null) return "On going trade";
+                if(game.getCurrentAuction() != null) return "Finish auction";
+                for(Player checkMon : game.getPlayers()) {
+                    if(checkMon.getCash() < 0) return "A player is in debt";
+                }
+                for(PlayerProperty prop: game.getPlayerProperties()) {
+                    if(prop.isOwned() && prop.isMortgaged() && prop.isJustTraded()) return "Must pay for just traded property";
+                }
+                if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && !game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).isOwned()) return "Need to auction or buy prop";
                 if(!currentPlayer.isJailed()) {
                  if(!currentPlayer.isInDebt()) {
                      currentPlayer.endTurn();
@@ -74,11 +82,11 @@ public class MonopolyServer {
         put("/buyproperty", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).getOwnerID() == null) {
+                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && !game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).isOwned()) {
                      PlayerProperty prop =  game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID());
                      if(currentPlayer.canSubCash(prop.getPrice())) {
                          currentPlayer.addCash(-prop.getPrice());
-                         prop.setOwner(currentPlayer.getPlayerID());
+                         prop.setOwner(currentPlayer);
                          return "Bought";
                      } else return "You don't have enough money";
                  } else return "You can't buy this";
@@ -90,7 +98,7 @@ public class MonopolyServer {
         put("/auctionproperty", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).getOwnerID() == null) {
+                 if(game.getCurrentAuction() == null && game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID() != -1 && !game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID()).isOwned()) {
                      PlayerProperty prop =  game.getPlayerProperty(game.getBoard().getTileFromID(currentPlayer.getCurrentTileID()).getPropertyID());
                      game.setCurrentAuction(new Auction(prop));
                     return "Auctioned";
@@ -100,14 +108,15 @@ public class MonopolyServer {
             }
         });
         
-        put("/bid/:amount", (request, response) -> {
+        put("/bid/:amount", (request, response) -> {//Need to make work for requesting player
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                 if(game.getCurrentAuction() != null && game.getCurrentAuction().hasPlayerPlacedBid(request.headers("id"))) {
+                 Player bettingPlayer = game.getPlayerFromID(request.headers("id"));
+                 if(game.getCurrentAuction() != null && game.getCurrentAuction().hasPlayerPlacedBid(bettingPlayer)) {
                      if(isNumeric(request.params("amount"))) {
                          int amount = Integer.parseInt(request.params("amount"));
-                         if(game.getPlayerFromID(request.headers("id")).canSubCash(amount)) { //Check if game.getPlayerFromID() is null***********
-                             game.getCurrentAuction().addBid(new Bid(amount, game.getPlayerFromID(request.headers("id"))));
+                         if(bettingPlayer.canSubCash(amount)) { //Check if game.getPlayerFromID() is null***********
+                             game.getCurrentAuction().addBid(new Bid(amount, bettingPlayer));
                              if(game.getCurrentAuction().canStartAuction(game)) {
                                 game.getCurrentAuction().auction();
                              }
@@ -127,31 +136,15 @@ public class MonopolyServer {
             }
         }); 
         
-        put("/paydebt", (request, response) -> {
+        put("/declarebankruptcy", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                 if(currentPlayer.getDebt() != null) {
-                     Debt debt = currentPlayer.getDebt();
-                     if(currentPlayer.canSubCash(debt.getAmount())) {
-                         currentPlayer.addCash(-debt.getAmount());
-                         if(currentPlayer.isJailed()) {
-                             game.setEligibleForRollAgain(true);
-                             game.setNotRollJail(true);
-                             currentPlayer.unJailPlayer();
-                         }
-                         
-                         if(debt.getReceiving()!= null) {
-                             game.getPlayerFromID(debt.getReceiving()).addCash(debt.getAmount());
-                         } 
-                         
-                         currentPlayer.setDebt(null);
-                         return "Whoo you payed your debt";
-                     } else return "You don't have enough money";
-                 } else return "You Don't owe money";
+               
+                return null; 
             } else {
                 return "Not your turn";
             }
-        });
+        }); 
         
         put("/payjail", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
@@ -174,7 +167,7 @@ public class MonopolyServer {
              if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                  if(currentPlayer.isJailed()) {
                     for(CCard c : game.getChanceCards()) {
-                        if(c.getType() ==9 && c.getOwnerID()!= null && c.getOwnerID().equals(currentPlayer.getPlayerID())) {
+                        if(c.getType() ==9 && c.getOwner()!= null && c.getOwner().equals(currentPlayer)) {
                             c.setOwner(null);
                             currentPlayer.unJailPlayer();
                             game.outOfJailTurn(true);
@@ -182,7 +175,7 @@ public class MonopolyServer {
                         }
                     }
                     for(CCard c : game.getCommunityCards()) {
-                        if(c.getType() ==9 && c.getOwnerID()!= null && c.getOwnerID().equals(currentPlayer.getPlayerID())) {
+                        if(c.getType() ==9 && c.getOwner()!= null && c.getOwner().equals(currentPlayer)) {
                             c.setOwner(null);
                             currentPlayer.unJailPlayer();
                             game.outOfJailTurn(true);
@@ -208,15 +201,13 @@ public class MonopolyServer {
                         return "Un-jailed";
                       } else {
                           if(currentPlayer.turnsInJail() > 2) {
-                                if(currentPlayer.canSubCash(50)) {
+                                
                                     currentPlayer.addCash(-50);
                                     game.setEligibleForRollAgain(true);
                                     game.setNotRollJail(true);
                                     currentPlayer.unJailPlayer();
-                                } else {
-                                    currentPlayer.setDebt(new Debt(currentPlayer.getPlayerID(), null, 50));
-                                }
-                              return "Pay 50 to get out then roll";
+                                
+                                    return "Payed 50 to get out then roll";
                           }  else {
                               game.nextTurn();
                               return "turn ended";
@@ -228,45 +219,52 @@ public class MonopolyServer {
             }
         });
         
-        put("/buyhouse/:id", (request, response) -> {
+        put("/buyhouse/:properties", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
-            if(isNumeric(request.params("id"))) {
+           
                 if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
-                    int id = Integer.parseInt(request.params("id"));
-                    if(id < 40 && id > -1) {
-                        PlayerProperty prop = game.getPlayerProperty(id);
-                        if(prop.getColorID()!=-1 && prop.getOwnerID()!= null && currentPlayer.getPlayerID().equals(prop.getOwnerID())) {
-                            if(game.doesPlayerOwnAllColor(currentPlayer.getPlayerID(), prop) && game.canPutHouse(prop)) {
-                                if(currentPlayer.canSubCash(prop.getHouseCost())) {
-                                    currentPlayer.addCash(-prop.getHouseCost());
-                                    prop.addHouse();
-                                    return "You bought a house for "+id;
-                                } else return "You need money";
-                            } else {
-                                return "You do not own a monoply on this color/need to buy other houses";
-                            }
-                        } else {
-                             return "You do not own this propperty";
-                        }
-                    } else {
-                        return "Not a vaild id";
+                    //Need to do validation lol
+                    String[] propWithHouse = request.params("properties").split(",");
+                    ArrayList<ProposedHouse> propData = new ArrayList<>();
+                    for(String s : propWithHouse) {
+                        String[] sSplit = s.split(":");
+                        propData.add(new ProposedHouse(Integer.parseInt(sSplit[0]), Integer.parseInt(sSplit[1])));
                     }
-                   
+                    
+//                    int id = Integer.parseInt(request.params("id"));
+//                    if(id < 40 && id > -1) {
+//                        PlayerProperty prop = game.getPlayerProperty(id);
+//                        if(prop.getColorID()!=-1 && prop.isOwned() && currentPlayer.equals(prop.getOwner())) {
+//                            if(game.doesPlayerOwnAllColor(currentPlayer, prop) && game.canPutHouse(prop)) {
+//                                if(currentPlayer.canSubCash(prop.getHouseCost())) {
+//                                    currentPlayer.addCash(-prop.getHouseCost());
+//                                    prop.addHouse();
+//                                    return "You bought a house for "+id;
+//                                } else return "You need money";
+//                            } else {
+//                                return "You do not own a monoply on this color/need to buy other houses";
+//                            }
+//                        } else {
+//                             return "You do not own this propperty";
+//                        }
+//                    } else {
+//                        return "Not a vaild id";
+//                    }
+                   return null;
                 } else return "Not your turn";
-            } else return "That is not a number...";
              
         });
         
         put("/buyhotel/:id", (request, response) -> {
             Player currentPlayer = game.getCurrentPlayer();
-           
+            
                 if(true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                      if(isNumeric(request.params("id"))) {
                     int id = Integer.parseInt(request.params("id"));
                     if(id < 40 && id > -1) {
                         PlayerProperty prop = game.getPlayerProperty(id);
-                        if(prop.getColorID()!=-1 && prop.getOwnerID()!= null && currentPlayer.getPlayerID().equals(prop.getOwnerID())) {
-                            if(game.doesPlayerOwnAllColor(currentPlayer.getPlayerID(), prop) && game.canPutHotel(prop)) {
+                        if(prop.getColorID()!=-1 && prop.isOwned() && currentPlayer.equals(prop)) {
+                            if(game.doesPlayerOwnAllColor(currentPlayer, prop) && game.canPutHotel(prop)) {
                                 if(currentPlayer.canSubCash(prop.getHotelCost())) {
                                     currentPlayer.addCash(-prop.getHotelCost());
                                     prop.setHotel(true);
@@ -405,7 +403,7 @@ public class MonopolyServer {
             if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                 if(isNumeric(request.params("id"))) {
                     PlayerProperty prop = game.getPlayerProperty(Integer.parseInt(request.params("id")));
-                    if(prop != null && prop.getOwnerID() != null && prop.getOwnerID().equals(currentPlayer.getPlayerID()) && !prop.hasHotel() && prop.getHouses()==0 && !prop.isMortgaged()) {
+                    if(prop != null && prop.isOwned() && prop.getOwner().equals(currentPlayer) && !prop.hasHotel() && prop.getHouses()==0 && !prop.isMortgaged()) {
                         for (PlayerProperty colorProp : game.getPlayerProperties()) {
                             if (colorProp.getColorID() == prop.getColorID() && prop.getID() != colorProp.getID()) {
                                 if (prop.hasHotel() || prop.getHouses() > 0) {
@@ -431,7 +429,7 @@ public class MonopolyServer {
             if (true) { //request.headers("id").equals(currentPlayer.getPlayerID())
                 if(isNumeric(request.params("id"))) {
                     PlayerProperty prop = game.getPlayerProperty(Integer.parseInt(request.params("id")));
-                    if(prop != null && prop.getOwnerID() != null && prop.getOwnerID().equals(currentPlayer.getPlayerID()) && prop.isMortgaged()) {
+                    if(prop != null && prop.isOwned() && prop.getOwner().equals(currentPlayer) && prop.isMortgaged()) {
                         int amount = (int)((prop.getPrice()/2)*1.1);
                         if(currentPlayer.canSubCash(amount)) {
                             currentPlayer.addCash(-amount);
@@ -462,7 +460,7 @@ public class MonopolyServer {
         });
     }
     
-
+    
     
     public static boolean isParamCorrectFormat(String s) {
         String[] data = s.split(",");
@@ -483,6 +481,14 @@ public class MonopolyServer {
             pArray[i] = game.getPlayerProperty(i);
         }
         return pArray;
+    }
+    
+    static class ProposedHouse {
+        public final int propID, numHouses;
+        public ProposedHouse(int prop, int houses) {
+            this.propID = prop;
+            this.numHouses = houses;
+        }
     }
     
 }

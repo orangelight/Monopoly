@@ -15,7 +15,7 @@ public class Player {
     private String playerID;
     private int cash, positionID, jailTurn;
     private boolean bankrupt, currentTurn, jail;
-    private Debt currentDebt;
+    private Player lastPayedMoneyTo;
 
     public Player(String id) {
         this.playerID = id;
@@ -76,13 +76,13 @@ public class Player {
        
     }
     
-    public void setDebt(Debt d) {
-        this.currentDebt = d;
+    public void setLastPayed(Player p) {
+        this.lastPayedMoneyTo = p;
     }
     
    
     
-    public boolean isInDebt() { return this.currentDebt != null; }
+    public boolean isInDebt() { return this.cash<0; }
     
     public String getPlayerID() { return this.playerID; }
     
@@ -90,8 +90,15 @@ public class Player {
     
     
     
-    public Debt getDebt() {
-        return this.currentDebt;
+    public Player getLastPayedTo() {
+        return this.lastPayedMoneyTo;
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof Player) {
+            return ((Player)o).getPlayerID().equals(this.getPlayerID());
+        } else return false;
     }
     
 }

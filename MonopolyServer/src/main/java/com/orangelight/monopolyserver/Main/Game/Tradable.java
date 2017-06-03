@@ -5,11 +5,13 @@
  */
 package com.orangelight.monopolyserver.Main.Game;
 
+import com.orangelight.monopolyserver.Main.Game.Player.Player;
+
 /**
  *
  * @author Alex
  */
 public interface Tradable {
-    public void setOwner(String s);
-    public String getOwnerID();
+    public void setOwner(Player p);
+    public Player getOwner();
 }
